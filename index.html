@@ -72,20 +72,23 @@
         }
 
         .logo {
-            font-size: 1.8rem;
-            font-weight: 800;
+            font-size: 1.5rem;
+            font-weight: 700;
             background: var(--gradient-2);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            letter-spacing: -1px;
+            letter-spacing: -0.5px;
         }
 
         .contact-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
+            padding: 1rem 1.5rem;
             background: var(--gradient-2);
             border: none;
             border-radius: 50px;
@@ -95,11 +98,13 @@
             transition: all 0.3s ease;
             text-decoration: none;
             box-shadow: var(--glow-cyan);
+            z-index: 1000;
+            font-size: 0.9rem;
         }
 
         .contact-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 0 30px rgba(0, 217, 255, 0.5);
+            transform: translateY(-3px);
+            box-shadow: 0 0 30px rgba(0, 217, 255, 0.6);
         }
 
         /* Hero Section */
@@ -369,6 +374,13 @@
             .crypto-grid {
                 grid-template-columns: 1fr;
             }
+            
+            .contact-btn {
+                bottom: 1rem;
+                right: 1rem;
+                padding: 0.875rem 1.25rem;
+                font-size: 0.85rem;
+            }
         }
     </style>
 </head>
@@ -376,13 +388,7 @@
     <div class="bg-animation"></div>
 
     <header>
-        <div class="logo">AKASH</div>
-        <a href="https://t.me/tgbakash" class="contact-btn" target="_blank">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.654-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z"/>
-            </svg>
-            Contact Me
-        </a>
+        <div class="logo">Akash Portfolio</div>
     </header>
 
     <main>
@@ -455,6 +461,13 @@
         <p>&copy; 2024 Akash Portfolio. Built with passion for code and crypto.</p>
     </footer>
 
+    <a href="https://t.me/tgbakash" class="contact-btn" target="_blank">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.654-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z"/>
+        </svg>
+        Contact
+    </a>
+
     <script>
         const API_KEY = 'KGCJ6B1CEYAEQTC3BPR42HVGNXNHFA1537';
         const ETH_ADDRESS = '0x10dE74EBDFa84f5e6390a1A61DEad8d491754039';
@@ -468,11 +481,16 @@
                 const response = await fetch(`https://api.etherscan.io/api?module=account&action=balance&address=${ETH_ADDRESS}&tag=latest&apikey=${API_KEY}`);
                 const data = await response.json();
                 
+                console.log('Balance API Response:', data);
+                
                 if (data.status === '1') {
                     const balanceInEth = parseFloat(data.result) / 1e18;
+                    console.log('Balance in ETH:', balanceInEth);
                     return balanceInEth;
+                } else {
+                    console.error('API returned status 0:', data.message);
+                    return 0;
                 }
-                return 0;
             } catch (error) {
                 console.error('Error fetching ETH balance:', error);
                 return 0;
@@ -485,10 +503,16 @@
                 const response = await fetch(`https://api.etherscan.io/api?module=stats&action=ethprice&apikey=${API_KEY}`);
                 const data = await response.json();
                 
-                if (data.status === '1') {
-                    return parseFloat(data.result.ethusd);
+                console.log('Price API Response:', data);
+                
+                if (data.status === '1' && data.result) {
+                    const price = parseFloat(data.result.ethusd);
+                    console.log('ETH Price:', price);
+                    return price;
+                } else {
+                    console.error('API returned status 0 or no result:', data.message);
+                    return 0;
                 }
-                return 0;
             } catch (error) {
                 console.error('Error fetching ETH price:', error);
                 return 0;
@@ -643,26 +667,50 @@
         // Initialize portfolio data
         async function initializePortfolio() {
             try {
+                console.log('Initializing portfolio...');
+                
                 const [balance, price, transactions] = await Promise.all([
                     fetchEthBalance(),
                     fetchEthPrice(),
                     fetchTransactionHistory()
                 ]);
 
+                console.log('Retrieved - Balance:', balance, 'Price:', price, 'Transactions:', transactions.length);
+
                 const portfolioValue = balance * price;
 
-                // Update UI
-                document.getElementById('eth-balance').textContent = balance.toFixed(6) + ' ETH';
-                document.getElementById('portfolio-value').textContent = '$' + portfolioValue.toFixed(2);
+                // Update UI - always display values even if 0
+                const balanceElement = document.getElementById('eth-balance');
+                const valueElement = document.getElementById('portfolio-value');
+                
+                if (balanceElement) {
+                    balanceElement.textContent = balance.toFixed(6) + ' ETH';
+                }
+                
+                if (valueElement) {
+                    valueElement.textContent = '$' + portfolioValue.toFixed(2);
+                }
 
                 // Calculate and display historical data
                 historicalData = calculateHistoricalValues(transactions, balance, price);
                 createPortfolioChart(historicalData);
 
+                console.log('Portfolio initialized successfully');
+
             } catch (error) {
                 console.error('Error initializing portfolio:', error);
-                document.getElementById('eth-balance').textContent = '0.000000 ETH';
-                document.getElementById('portfolio-value').textContent = '$0.00';
+                
+                // Show error state with actual zero values
+                const balanceElement = document.getElementById('eth-balance');
+                const valueElement = document.getElementById('portfolio-value');
+                
+                if (balanceElement) {
+                    balanceElement.textContent = '0.000000 ETH';
+                }
+                
+                if (valueElement) {
+                    valueElement.textContent = '$0.00';
+                }
                 
                 // Show empty chart
                 createPortfolioChart([
