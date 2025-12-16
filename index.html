@@ -3,150 +3,424 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Akash - Full Stack Developer</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Akash - Developer Portfolio</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #1e293b);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            color: white;
+            min-height: 100vh;
+        }
+
         @keyframes gradient {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-        .animated-gradient {
-            background: linear-gradient(-45deg, #1e3a8a, #4c1d95, #7c2d12, #1e293b);
-            background-size: 400% 400%;
-            animation: gradient 15s ease infinite;
+
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            backdrop-filter: blur(20px);
+            background: rgba(15, 23, 42, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            padding: 1.5rem 2rem;
         }
-        .glass {
+
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #60a5fa;
+        }
+
+        section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 6rem 2rem;
+        }
+
+        .hero {
+            text-align: center;
+            padding-top: 10rem;
+        }
+
+        h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            font-weight: 800;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 3rem;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            color: #94a3b8;
+            margin-bottom: 2rem;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .skill-card {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .skill-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-5px);
+        }
+
+        .skill-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .skill-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .skill-card p {
+            color: #94a3b8;
+        }
+
+        .project-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 2.5rem;
+            margin-top: 2rem;
+        }
+
+        .project-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .project-card h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .project-card p {
+            color: #cbd5e1;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .tags {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .tag {
+            background: rgba(59, 130, 246, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 2rem;
+        }
+
+        .stat-label {
+            color: #94a3b8;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .chart-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .address-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 2rem;
+        }
+
+        .address-text {
+            font-family: monospace;
+            font-size: 0.875rem;
+            word-break: break-all;
+            margin: 0.5rem 0;
+        }
+
+        .timestamp {
+            color: #64748b;
+            font-size: 0.75rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 4rem 0;
+        }
+
+        .spinner {
+            width: 3rem;
+            height: 3rem;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        footer {
+            text-align: center;
+            padding: 3rem 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+        }
+
+        footer a {
+            color: #94a3b8;
+            text-decoration: none;
+            margin: 0 1rem;
+        }
+
+        footer a:hover {
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5rem; }
+            h2 { font-size: 1.5rem; }
+            .subtitle { font-size: 1.2rem; }
+            section { padding: 4rem 1rem; }
+            .hero { padding-top: 8rem; }
         }
     </style>
 </head>
-<body class="animated-gradient min-h-screen text-white">
-    
-    <nav class="glass fixed w-full top-0 z-50">
-        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <h1 class="text-2xl font-bold">Akash</h1>
-            <div class="space-x-6">
-                <a href="#skills" class="hover:text-blue-300 transition">Skills</a>
-                <a href="#projects" class="hover:text-blue-300 transition">Projects</a>
-                <a href="#portfolio" class="hover:text-blue-300 transition">Portfolio</a>
+<body>
+    <nav>
+        <div class="nav-content">
+            <div class="logo">Akash</div>
+            <div class="nav-links">
+                <a href="#skills">Skills</a>
+                <a href="#projects">Projects</a>
+                <a href="#portfolio">Portfolio</a>
             </div>
         </div>
     </nav>
 
-    <section class="pt-32 pb-20 px-6">
-        <div class="container mx-auto text-center max-w-4xl">
-            <h2 class="text-5xl md:text-6xl font-bold mb-6">Full Stack Developer</h2>
-            <p class="text-xl md:text-2xl mb-8 text-gray-300">
-                Building innovative solutions with Python, C++, and JavaScript
+    <section class="hero">
+        <h1>Akash</h1>
+        <div class="subtitle">Full Stack Developer</div>
+        <p style="max-width: 600px; margin: 0 auto 2rem; color: #cbd5e1;">
+            Building innovative solutions with Python, C++, and JavaScript. 
+            Specializing in crypto trading bots and blockchain applications.
+        </p>
+        <div class="btn-group">
+            <a href="#projects" class="btn btn-primary">View Projects</a>
+            <a href="#portfolio" class="btn btn-secondary">Crypto Portfolio</a>
+        </div>
+    </section>
+
+    <section id="skills">
+        <h2>Skills</h2>
+        <div class="skills-grid">
+            <div class="skill-card">
+                <div class="skill-icon">🐍</div>
+                <h3>Python</h3>
+                <p>Backend Development, APIs, Automation</p>
+            </div>
+            <div class="skill-card">
+                <div class="skill-icon">⚡</div>
+                <h3>C++</h3>
+                <p>Systems Programming, Performance</p>
+            </div>
+            <div class="skill-card">
+                <div class="skill-icon">💻</div>
+                <h3>JavaScript</h3>
+                <p>Web Development, React, Node.js</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="projects">
+        <h2>Featured Project</h2>
+        <div class="project-card">
+            <div class="project-icon">🤖</div>
+            <h3>Buy/Sell Sessions Bot</h3>
+            <p>
+                Advanced Telegram bot for cryptocurrency trading sessions. Features real-time market analysis, 
+                automated trading signals, and comprehensive portfolio management tools.
             </p>
-            <div class="flex gap-4 justify-center flex-wrap">
-                <a href="#projects" class="bg-blue-600 hover:bg-blue-700 px-8 py-3 rounded-lg font-semibold transition">
-                    View Projects
-                </a>
-                <a href="#portfolio" class="glass px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition">
-                    Crypto Portfolio
-                </a>
+            <div class="tags">
+                <span class="tag">Python</span>
+                <span class="tag">Telegram API</span>
+                <span class="tag">Web3</span>
+                <span class="tag">Trading</span>
             </div>
-        </div>
-    </section>
-
-    <section id="skills" class="py-20 px-6">
-        <div class="container mx-auto max-w-4xl">
-            <h3 class="text-4xl font-bold text-center mb-12">Skills</h3>
-            <div class="grid md:grid-cols-3 gap-6">
-                <div class="glass rounded-xl p-6 text-center">
-                    <div class="text-4xl mb-3">🐍</div>
-                    <h4 class="text-xl font-bold mb-2">Python</h4>
-                    <p class="text-gray-400">Backend Development, APIs, Automation</p>
-                </div>
-                <div class="glass rounded-xl p-6 text-center">
-                    <div class="text-4xl mb-3">⚡</div>
-                    <h4 class="text-xl font-bold mb-2">C++</h4>
-                    <p class="text-gray-400">Systems Programming, Performance</p>
-                </div>
-                <div class="glass rounded-xl p-6 text-center">
-                    <div class="text-4xl mb-3">💻</div>
-                    <h4 class="text-xl font-bold mb-2">JavaScript</h4>
-                    <p class="text-gray-400">Web Development, React, Node.js</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="projects" class="py-20 px-6">
-        <div class="container mx-auto max-w-4xl">
-            <h3 class="text-4xl font-bold text-center mb-12">Projects</h3>
-            <div class="glass rounded-2xl p-8">
-                <div class="text-5xl mb-4">🤖</div>
-                <h4 class="text-2xl font-bold mb-3">Buy/Sell Sessions Bot</h4>
-                <p class="text-gray-300 mb-6">
-                    Telegram bot for cryptocurrency trading sessions with real-time market analysis and automated trading signals.
-                </p>
-                <div class="flex gap-3 mb-6 flex-wrap">
-                    <span class="bg-blue-600/30 px-4 py-2 rounded-lg text-sm">Python</span>
-                    <span class="bg-green-600/30 px-4 py-2 rounded-lg text-sm">Telegram API</span>
-                    <span class="bg-purple-600/30 px-4 py-2 rounded-lg text-sm">Web3</span>
-                </div>
-                <a href="https://t.me/buysellsessionsbot" target="_blank" 
-                   class="inline-block bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg transition">
-                    Try Bot →
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <section id="portfolio" class="py-20 px-6">
-        <div class="container mx-auto max-w-5xl">
-            <h3 class="text-4xl font-bold text-center mb-12">Crypto Portfolio</h3>
-            
-            <div id="loading" class="text-center py-12">
-                <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-                <p class="mt-4 text-gray-300">Loading portfolio...</p>
-            </div>
-
-            <div id="portfolioContent" class="hidden">
-                <div class="grid md:grid-cols-3 gap-6 mb-8">
-                    <div class="glass rounded-xl p-6">
-                        <p class="text-gray-400 text-sm mb-2">ETH Balance</p>
-                        <p class="text-3xl font-bold" id="ethBalance">0</p>
-                    </div>
-                    <div class="glass rounded-xl p-6">
-                        <p class="text-gray-400 text-sm mb-2">ETH Price</p>
-                        <p class="text-3xl font-bold" id="ethPrice">$0</p>
-                    </div>
-                    <div class="glass rounded-xl p-6">
-                        <p class="text-gray-400 text-sm mb-2">Portfolio Value</p>
-                        <p class="text-3xl font-bold" id="totalValue">$0</p>
-                    </div>
-                </div>
-
-                <div class="glass rounded-xl p-6 mb-8">
-                    <h4 class="text-xl font-bold mb-4">7-Day Performance</h4>
-                    <canvas id="portfolioChart"></canvas>
-                </div>
-
-                <div class="glass rounded-xl p-6">
-                    <p class="text-gray-400 text-sm mb-2">Address</p>
-                    <p class="font-mono text-sm break-all mb-3">0x10dE74EBDFa84f5e6390a1A61DEad8d491754039</p>
-                    <p class="text-xs text-gray-500">Last updated: <span id="lastUpdate">-</span></p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <footer class="py-12 px-6 text-center border-t border-white/10">
-        <p class="text-gray-400 mb-4">© 2024 Akash. Full Stack Developer.</p>
-        <div class="flex gap-6 justify-center">
-            <a href="https://t.me/buysellsessionsbot" target="_blank" class="text-gray-400 hover:text-white transition">
-                Telegram
+            <a href="https://t.me/buysellsessionsbot" target="_blank" class="btn btn-primary">
+                Try Bot →
             </a>
-            <a href="https://etherscan.io/address/0x10dE74EBDFa84f5e6390a1A61DEad8d491754039" target="_blank" class="text-gray-400 hover:text-white transition">
-                Etherscan
-            </a>
+        </div>
+    </section>
+
+    <section id="portfolio">
+        <h2>Crypto Portfolio</h2>
+        
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Loading portfolio data...</p>
+        </div>
+
+        <div id="portfolioContent" class="hidden">
+            <div class="portfolio-grid">
+                <div class="stat-card">
+                    <div class="stat-label">ETH Balance</div>
+                    <div class="stat-value" id="ethBalance">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">ETH Price</div>
+                    <div class="stat-value" id="ethPrice">$0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Portfolio Value</div>
+                    <div class="stat-value" id="totalValue">$0</div>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3 style="margin-bottom: 1.5rem;">7-Day Performance</h3>
+                <canvas id="portfolioChart"></canvas>
+            </div>
+
+            <div class="address-card">
+                <div class="stat-label">Ethereum Address</div>
+                <div class="address-text">0x10dE74EBDFa84f5e6390a1A61DEad8d491754039</div>
+                <div class="timestamp">Last updated: <span id="lastUpdate">-</span></div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2024 Akash. Full Stack Developer.</p>
+        <div style="margin-top: 1rem;">
+            <a href="https://t.me/buysellsessionsbot" target="_blank">Telegram</a>
+            <a href="https://etherscan.io/address/0x10dE74EBDFa84f5e6390a1A61DEad8d491754039" target="_blank">Etherscan</a>
         </div>
     </footer>
 
@@ -182,7 +456,7 @@
                 })
                 .catch(function(error) {
                     console.error('Error:', error);
-                    document.getElementById('loading').innerHTML = '<p class="text-red-400">Failed to load data</p>';
+                    document.getElementById('loading').innerHTML = '<p style="color: #f87171;">Failed to load portfolio data</p>';
                 });
         }
 
@@ -209,12 +483,13 @@
                     datasets: [{
                         label: 'Portfolio Value',
                         data: portfolioValues,
-                        borderColor: 'rgb(59, 130, 246)',
+                        borderColor: '#3b82f6',
                         backgroundColor: 'rgba(59, 130, 246, 0.1)',
                         tension: 0.4,
                         fill: true,
-                        pointRadius: 2,
-                        pointHoverRadius: 5
+                        pointRadius: 3,
+                        pointHoverRadius: 6,
+                        borderWidth: 2
                     }]
                 },
                 options: {
@@ -225,8 +500,8 @@
                             display: false
                         },
                         tooltip: {
-                            mode: 'index',
-                            intersect: false,
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
                             callbacks: {
                                 label: function(context) {
                                     return '$' + Math.round(context.parsed.y).toLocaleString();
@@ -237,21 +512,21 @@
                     scales: {
                         y: {
                             ticks: {
-                                color: 'white',
+                                color: '#94a3b8',
                                 callback: function(value) {
                                     return '$' + Math.round(value).toLocaleString();
                                 }
                             },
                             grid: {
-                                color: 'rgba(255, 255, 255, 0.05)'
+                                color: 'rgba(148, 163, 184, 0.1)'
                             }
                         },
                         x: {
                             ticks: {
-                                color: 'white'
+                                color: '#94a3b8'
                             },
                             grid: {
-                                color: 'rgba(255, 255, 255, 0.05)'
+                                color: 'rgba(148, 163, 184, 0.1)'
                             }
                         }
                     }
@@ -264,10 +539,7 @@
                 e.preventDefault();
                 var target = document.querySelector(this.getAttribute('href'));
                 if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             });
         });
