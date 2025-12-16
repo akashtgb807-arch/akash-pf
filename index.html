@@ -465,7 +465,7 @@
                 <div class="crypto-label">Ethereum Address</div>
                 <div class="eth-address">0x10dE74EBDFa84f5e6390a1A61DEad8d491754039</div>
                 <div class="api-warning" id="api-warning">
-                    ⚠️ Note: Using fallback data. Etherscan API key may need verification.
+                    ⚠️ Note: Make sure your Etherscan API key is created after August 2025 for V2 API access.
                 </div>
             </div>
 
@@ -493,33 +493,24 @@
         let portfolioChart = null;
         let historicalData = [];
 
-        // Fetch ETH balance
+        // Fetch ETH balance using V2 API
         async function fetchEthBalance() {
             try {
-                const response = await fetch(`https://api.etherscan.io/api?module=account&action=balance&address=${ETH_ADDRESS}&tag=latest&apikey=${API_KEY}`);
+                // Using V2 API endpoint with chainid for Ethereum mainnet
+                const response = await fetch(`https://api.etherscan.io/v2/api?chainid=1&module=account&action=balance&address=${ETH_ADDRESS}&tag=latest&apikey=${API_KEY}`);
                 const data = await response.json();
                 
-                console.log('Balance API Response:', data);
+                console.log('Balance API Response (V2):', data);
                 
                 if (data.status === '1') {
                     const balanceInEth = parseFloat(data.result) / 1e18;
                     console.log('Balance in ETH:', balanceInEth);
                     return balanceInEth;
                 } else if (data.message === 'NOTOK') {
-                    console.error('API Key Issue:', data.result);
-                    // Try without API key as fallback
-                    const fallbackResponse = await fetch(`https://api.etherscan.io/api?module=account&action=balance&address=${ETH_ADDRESS}&tag=latest`);
-                    const fallbackData = await fallbackResponse.json();
-                    console.log('Fallback Balance API Response:', fallbackData);
-                    
-                    if (fallbackData.status === '1') {
-                        const balanceInEth = parseFloat(fallbackData.result) / 1e18;
-                        console.log('Balance in ETH (fallback):', balanceInEth);
-                        return balanceInEth;
-                    }
+                    console.error('API Error:', data.result);
                     return 0;
                 } else {
-                    console.error('API returned status 0:', data.message);
+                    console.error('API returned unexpected status:', data);
                     return 0;
                 }
             } catch (error) {
@@ -528,14 +519,14 @@
             }
         }
 
-        // Fetch ETH price from CoinGecko (no API key needed)
+        // Fetch ETH price using V2 API
         async function fetchEthPrice() {
             try {
-                // Try Etherscan first
-                const etherscanResponse = await fetch(`https://api.etherscan.io/api?module=stats&action=ethprice&apikey=${API_KEY}`);
+                // Try Etherscan V2 API first
+                const etherscanResponse = await fetch(`https://api.etherscan.io/v2/api?chainid=1&module=stats&action=ethprice&apikey=${API_KEY}`);
                 const etherscanData = await etherscanResponse.json();
                 
-                console.log('Price API Response:', etherscanData);
+                console.log('Price API Response (V2):', etherscanData);
                 
                 if (etherscanData.status === '1' && etherscanData.result) {
                     const price = parseFloat(etherscanData.result.ethusd);
@@ -562,11 +553,13 @@
             }
         }
 
-        // Fetch historical transactions for the chart
+        // Fetch historical transactions for the chart using V2 API
         async function fetchTransactionHistory() {
             try {
-                const response = await fetch(`https://api.etherscan.io/api?module=account&action=txlist&address=${ETH_ADDRESS}&startblock=0&endblock=99999999&page=1&offset=100&sort=asc&apikey=${API_KEY}`);
+                const response = await fetch(`https://api.etherscan.io/v2/api?chainid=1&module=account&action=txlist&address=${ETH_ADDRESS}&startblock=0&endblock=99999999&page=1&offset=100&sort=asc&apikey=${API_KEY}`);
                 const data = await response.json();
+                
+                console.log('Transaction History Response (V2):', data);
                 
                 if (data.status === '1' && data.result.length > 0) {
                     return data.result;
