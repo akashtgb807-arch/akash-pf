@@ -349,6 +349,105 @@
             margin-right: auto;
         }
 
+        .tokens-section {
+            margin: 3rem 0;
+        }
+
+        .tokens-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .token-card {
+            background: var(--bg-secondary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .token-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gradient-2);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .token-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.2);
+        }
+
+        .token-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .token-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .token-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+
+        .token-name {
+            flex: 1;
+        }
+
+        .token-symbol {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .token-chain {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .token-balance {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--accent-green);
+            margin: 0.5rem 0;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .token-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .token-price {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
         .loading {
             text-align: center;
             padding: 2rem;
@@ -446,22 +545,31 @@
             
             <div class="crypto-grid">
                 <div class="crypto-card">
-                    <div class="crypto-label">ETH Balance</div>
-                    <div class="crypto-value" id="eth-balance">
-                        <span class="loading">Loading</span>
-                    </div>
-                    <div class="crypto-label">Ethereum</div>
-                </div>
-                <div class="crypto-card">
-                    <div class="crypto-label">Portfolio Value</div>
-                    <div class="crypto-value" id="portfolio-value">
+                    <div class="crypto-label">Total Portfolio Value</div>
+                    <div class="crypto-value" id="total-portfolio-value">
                         <span class="loading">Loading</span>
                     </div>
                     <div class="crypto-label">USD</div>
                 </div>
+                <div class="crypto-card">
+                    <div class="crypto-label">ETH Balance</div>
+                    <div class="crypto-value" id="eth-balance">
+                        <span class="loading">Loading</span>
+                    </div>
+                    <div class="crypto-label">Ethereum Mainnet</div>
+                </div>
             </div>
 
-            <div class="crypto-card">
+            <div class="tokens-section">
+                <h3 style="color: var(--accent-cyan); margin-bottom: 1.5rem; font-size: 1.8rem;">Token Holdings</h3>
+                <div class="tokens-grid" id="tokens-grid">
+                    <div class="loading" style="text-align: center; padding: 2rem; grid-column: 1 / -1;">
+                        Loading tokens
+                    </div>
+                </div>
+            </div>
+
+            <div class="crypto-card" style="margin-top: 2rem;">
                 <div class="crypto-label">Ethereum Address</div>
                 <div class="eth-address">0x10dE74EBDFa84f5e6390a1A61DEad8d491754039</div>
                 <div class="api-warning" id="api-warning">
@@ -490,154 +598,180 @@
         const API_KEY = 'KGCJ6B1CEYAEQTC3BPR42HVGNXNHFA1537';
         const ETH_ADDRESS = '0x10dE74EBDFa84f5e6390a1A61DEad8d491754039';
         
+        // Chain configurations
+        const CHAINS = {
+            ethereum: { chainId: 1, name: 'Ethereum', explorer: 'etherscan.io' },
+            base: { chainId: 8453, name: 'Base', explorer: 'basescan.org' },
+            arbitrum: { chainId: 42161, name: 'Arbitrum', explorer: 'arbiscan.io' },
+            optimism: { chainId: 10, name: 'Optimism', explorer: 'optimistic.etherscan.io' },
+            polygon: { chainId: 137, name: 'Polygon', explorer: 'polygonscan.com' }
+        };
+        
         let portfolioChart = null;
-        let historicalData = [];
+        let allTokens = [];
 
-        // Fetch ETH balance using V2 API
-        async function fetchEthBalance() {
+        // Fetch native balance for a chain
+        async function fetchNativeBalance(chainId) {
             try {
-                // Using V2 API endpoint with chainid for Ethereum mainnet
-                const response = await fetch(`https://api.etherscan.io/v2/api?chainid=1&module=account&action=balance&address=${ETH_ADDRESS}&tag=latest&apikey=${API_KEY}`);
+                const response = await fetch(`https://api.etherscan.io/v2/api?chainid=${chainId}&module=account&action=balance&address=${ETH_ADDRESS}&tag=latest&apikey=${API_KEY}`);
                 const data = await response.json();
                 
-                console.log('Balance API Response (V2):', data);
-                
                 if (data.status === '1') {
-                    const balanceInEth = parseFloat(data.result) / 1e18;
-                    console.log('Balance in ETH:', balanceInEth);
-                    return balanceInEth;
-                } else if (data.message === 'NOTOK') {
-                    console.error('API Error:', data.result);
-                    return 0;
-                } else {
-                    console.error('API returned unexpected status:', data);
-                    return 0;
+                    return parseFloat(data.result) / 1e18;
                 }
+                return 0;
             } catch (error) {
-                console.error('Error fetching ETH balance:', error);
+                console.error(`Error fetching balance for chain ${chainId}:`, error);
                 return 0;
             }
         }
 
-        // Fetch ETH price using V2 API
-        async function fetchEthPrice() {
+        // Fetch token balances for a chain
+        async function fetchTokenBalances(chainId) {
             try {
-                // Try Etherscan V2 API first
-                const etherscanResponse = await fetch(`https://api.etherscan.io/v2/api?chainid=1&module=stats&action=ethprice&apikey=${API_KEY}`);
-                const etherscanData = await etherscanResponse.json();
-                
-                console.log('Price API Response (V2):', etherscanData);
-                
-                if (etherscanData.status === '1' && etherscanData.result) {
-                    const price = parseFloat(etherscanData.result.ethusd);
-                    console.log('ETH Price from Etherscan:', price);
-                    return price;
-                }
-                
-                // Fallback to CoinGecko
-                console.log('Etherscan failed, trying CoinGecko...');
-                const coinGeckoResponse = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
-                const coinGeckoData = await coinGeckoResponse.json();
-                
-                if (coinGeckoData.ethereum && coinGeckoData.ethereum.usd) {
-                    const price = coinGeckoData.ethereum.usd;
-                    console.log('ETH Price from CoinGecko:', price);
-                    return price;
-                }
-                
-                console.error('Both APIs failed to return price');
-                return 3500; // Fallback approximate price
-            } catch (error) {
-                console.error('Error fetching ETH price:', error);
-                return 3500; // Fallback approximate price
-            }
-        }
-
-        // Fetch historical transactions for the chart using V2 API
-        async function fetchTransactionHistory() {
-            try {
-                const response = await fetch(`https://api.etherscan.io/v2/api?chainid=1&module=account&action=txlist&address=${ETH_ADDRESS}&startblock=0&endblock=99999999&page=1&offset=100&sort=asc&apikey=${API_KEY}`);
+                const response = await fetch(`https://api.etherscan.io/v2/api?chainid=${chainId}&module=account&action=tokentx&address=${ETH_ADDRESS}&page=1&offset=10000&sort=desc&apikey=${API_KEY}`);
                 const data = await response.json();
                 
-                console.log('Transaction History Response (V2):', data);
-                
                 if (data.status === '1' && data.result.length > 0) {
-                    return data.result;
+                    // Group by token contract and get unique tokens
+                    const tokenMap = new Map();
+                    
+                    for (const tx of data.result) {
+                        const contractAddress = tx.contractAddress;
+                        if (!tokenMap.has(contractAddress)) {
+                            tokenMap.set(contractAddress, {
+                                contractAddress: contractAddress,
+                                tokenSymbol: tx.tokenSymbol,
+                                tokenName: tx.tokenName,
+                                tokenDecimal: parseInt(tx.tokenDecimal)
+                            });
+                        }
+                    }
+                    
+                    return Array.from(tokenMap.values());
                 }
                 return [];
             } catch (error) {
-                console.error('Error fetching transaction history:', error);
+                console.error(`Error fetching tokens for chain ${chainId}:`, error);
                 return [];
             }
         }
 
-        // Calculate portfolio value over time
-        function calculateHistoricalValues(transactions, currentBalance, currentPrice) {
-            if (transactions.length === 0) {
-                // If no transactions, create dummy data showing current value
-                const now = Date.now();
-                return [
-                    { date: new Date(now - 30 * 24 * 60 * 60 * 1000), value: currentBalance * currentPrice * 0.8 },
-                    { date: new Date(now - 20 * 24 * 60 * 60 * 1000), value: currentBalance * currentPrice * 0.9 },
-                    { date: new Date(now - 10 * 24 * 60 * 60 * 1000), value: currentBalance * currentPrice * 0.95 },
-                    { date: new Date(now), value: currentBalance * currentPrice }
-                ];
-            }
-
-            // Process actual transactions
-            let runningBalance = 0;
-            const values = [];
-            
-            transactions.forEach(tx => {
-                const timestamp = parseInt(tx.timeStamp) * 1000;
-                const value = parseFloat(tx.value) / 1e18;
+        // Fetch specific token balance
+        async function fetchTokenBalance(chainId, contractAddress, decimals) {
+            try {
+                const response = await fetch(`https://api.etherscan.io/v2/api?chainid=${chainId}&module=account&action=tokenbalance&contractaddress=${contractAddress}&address=${ETH_ADDRESS}&tag=latest&apikey=${API_KEY}`);
+                const data = await response.json();
                 
-                if (tx.to.toLowerCase() === ETH_ADDRESS.toLowerCase()) {
-                    runningBalance += value;
-                } else if (tx.from.toLowerCase() === ETH_ADDRESS.toLowerCase()) {
-                    runningBalance -= value;
+                if (data.status === '1') {
+                    return parseFloat(data.result) / Math.pow(10, decimals);
+                }
+                return 0;
+            } catch (error) {
+                console.error(`Error fetching token balance:`, error);
+                return 0;
+            }
+        }
+
+        // Fetch token price from CoinGecko
+        async function fetchTokenPrice(tokenSymbol, contractAddress) {
+            try {
+                // Try by contract address first (more accurate)
+                if (contractAddress) {
+                    const response = await fetch(`https://api.coingecko.com/api/v3/simple/token_price/ethereum?contract_addresses=${contractAddress}&vs_currencies=usd`);
+                    const data = await response.json();
+                    
+                    if (data[contractAddress.toLowerCase()]?.usd) {
+                        return data[contractAddress.toLowerCase()].usd;
+                    }
                 }
                 
-                values.push({
-                    date: new Date(timestamp),
-                    value: runningBalance * currentPrice
-                });
-            });
+                // Fallback to symbol search
+                const searchResponse = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${tokenSymbol.toLowerCase()}&vs_currencies=usd`);
+                const searchData = await searchResponse.json();
+                
+                if (searchData[tokenSymbol.toLowerCase()]?.usd) {
+                    return searchData[tokenSymbol.toLowerCase()].usd;
+                }
+                
+                return 0;
+            } catch (error) {
+                console.error(`Error fetching price for ${tokenSymbol}:`, error);
+                return 0;
+            }
+        }
+
+        // Fetch ETH price
+        async function fetchEthPrice() {
+            try {
+                const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
+                const data = await response.json();
+                
+                if (data.ethereum?.usd) {
+                    return data.ethereum.usd;
+                }
+                return 3500;
+            } catch (error) {
+                console.error('Error fetching ETH price:', error);
+                return 3500;
+            }
+        }
+
+        // Render token cards
+        function renderTokens(tokens) {
+            const tokensGrid = document.getElementById('tokens-grid');
             
-            // Add current value
-            values.push({
-                date: new Date(),
-                value: currentBalance * currentPrice
-            });
+            if (tokens.length === 0) {
+                tokensGrid.innerHTML = '<div style="text-align: center; padding: 2rem; grid-column: 1 / -1; color: var(--text-secondary);">No tokens found with value > $5</div>';
+                return;
+            }
             
-            return values;
+            tokensGrid.innerHTML = tokens.map(token => `
+                <div class="token-card">
+                    <div class="token-header">
+                        <div class="token-icon">${token.symbol.charAt(0)}</div>
+                        <div class="token-name">
+                            <div class="token-symbol">${token.symbol}</div>
+                            <div class="token-chain">${token.chain}</div>
+                        </div>
+                    </div>
+                    <div class="token-value">$${token.value.toFixed(2)}</div>
+                    <div class="token-balance">${token.balance.toFixed(4)} ${token.symbol}</div>
+                    <div class="token-price">@ $${token.price.toFixed(4)}</div>
+                </div>
+            `).join('');
         }
 
         // Create portfolio chart
-        function createPortfolioChart(historicalData) {
+        function createPortfolioChart(tokens) {
             const ctx = document.getElementById('portfolioChart').getContext('2d');
             
             if (portfolioChart) {
                 portfolioChart.destroy();
             }
             
+            // Prepare data for pie chart
+            const labels = tokens.map(t => t.symbol);
+            const values = tokens.map(t => t.value);
+            const colors = [
+                'rgba(0, 217, 255, 0.8)',
+                'rgba(139, 92, 246, 0.8)',
+                'rgba(16, 185, 129, 0.8)',
+                'rgba(251, 191, 36, 0.8)',
+                'rgba(239, 68, 68, 0.8)',
+                'rgba(236, 72, 153, 0.8)',
+                'rgba(59, 130, 246, 0.8)'
+            ];
+            
             portfolioChart = new Chart(ctx, {
-                type: 'line',
+                type: 'doughnut',
                 data: {
-                    labels: historicalData.map(d => d.date.toLocaleDateString()),
+                    labels: labels,
                     datasets: [{
-                        label: 'Portfolio Value (USD)',
-                        data: historicalData.map(d => d.value),
-                        borderColor: '#00d9ff',
-                        backgroundColor: 'rgba(0, 217, 255, 0.1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 4,
-                        pointBackgroundColor: '#00d9ff',
-                        pointBorderColor: '#0a0e27',
-                        pointBorderWidth: 2,
-                        pointHoverRadius: 6
+                        data: values,
+                        backgroundColor: colors.slice(0, tokens.length),
+                        borderColor: '#0a0e27',
+                        borderWidth: 3
                     }]
                 },
                 options: {
@@ -645,13 +779,14 @@
                     maintainAspectRatio: true,
                     plugins: {
                         legend: {
-                            display: true,
+                            position: 'bottom',
                             labels: {
                                 color: '#e2e8f0',
                                 font: {
-                                    size: 14,
+                                    size: 13,
                                     family: 'Outfit'
-                                }
+                                },
+                                padding: 15
                             }
                         },
                         tooltip: {
@@ -661,37 +796,13 @@
                             borderColor: '#00d9ff',
                             borderWidth: 1,
                             padding: 12,
-                            displayColors: false,
                             callbacks: {
                                 label: function(context) {
-                                    return '$' + context.parsed.y.toFixed(2);
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.05)'
-                            },
-                            ticks: {
-                                color: '#94a3b8',
-                                font: {
-                                    family: 'JetBrains Mono'
-                                }
-                            }
-                        },
-                        y: {
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.05)'
-                            },
-                            ticks: {
-                                color: '#94a3b8',
-                                font: {
-                                    family: 'JetBrains Mono'
-                                },
-                                callback: function(value) {
-                                    return '$' + value.toFixed(2);
+                                    const token = tokens[context.dataIndex];
+                                    return [
+                                        `${token.symbol}: $${token.value.toFixed(2)}`,
+                                        `Balance: ${token.balance.toFixed(4)}`
+                                    ];
                                 }
                             }
                         }
@@ -700,78 +811,94 @@
             });
         }
 
-        // Initialize portfolio data
+        // Initialize portfolio
         async function initializePortfolio() {
             try {
-                console.log('Initializing portfolio...');
+                console.log('Initializing multi-chain portfolio...');
                 
-                const [balance, price, transactions] = await Promise.all([
-                    fetchEthBalance(),
-                    fetchEthPrice(),
-                    fetchTransactionHistory()
-                ]);
-
-                console.log('Retrieved - Balance:', balance, 'Price:', price, 'Transactions:', transactions.length);
-
-                const portfolioValue = balance * price;
-
-                // Update UI - always display values even if 0
-                const balanceElement = document.getElementById('eth-balance');
-                const valueElement = document.getElementById('portfolio-value');
-                const warningElement = document.getElementById('api-warning');
+                const ethPrice = await fetchEthPrice();
+                console.log('ETH Price:', ethPrice);
                 
-                if (balanceElement) {
-                    balanceElement.textContent = balance.toFixed(6) + ' ETH';
+                allTokens = [];
+                
+                // Fetch ETH balance on Ethereum mainnet
+                const ethBalance = await fetchNativeBalance(1);
+                const ethValue = ethBalance * ethPrice;
+                
+                document.getElementById('eth-balance').textContent = `${ethBalance.toFixed(6)} ETH ($${ethValue.toFixed(2)})`;
+                
+                if (ethValue > 5) {
+                    allTokens.push({
+                        symbol: 'ETH',
+                        balance: ethBalance,
+                        price: ethPrice,
+                        value: ethValue,
+                        chain: 'Ethereum'
+                    });
                 }
                 
-                if (valueElement) {
-                    valueElement.textContent = '$' + portfolioValue.toFixed(2);
+                // Fetch tokens from all chains
+                for (const [key, chain] of Object.entries(CHAINS)) {
+                    console.log(`Fetching tokens from ${chain.name}...`);
+                    
+                    const tokens = await fetchTokenBalances(chain.chainId);
+                    console.log(`Found ${tokens.length} unique tokens on ${chain.name}`);
+                    
+                    // Get balance and price for each token
+                    for (const token of tokens) {
+                        const balance = await fetchTokenBalance(chain.chainId, token.contractAddress, token.tokenDecimal);
+                        
+                        if (balance > 0) {
+                            const price = await fetchTokenPrice(token.tokenSymbol, token.contractAddress);
+                            const value = balance * price;
+                            
+                            console.log(`${token.tokenSymbol}: ${balance} @ $${price} = $${value}`);
+                            
+                            // Only include tokens worth more than $5
+                            if (value > 5) {
+                                allTokens.push({
+                                    symbol: token.tokenSymbol,
+                                    balance: balance,
+                                    price: price,
+                                    value: value,
+                                    chain: chain.name,
+                                    contractAddress: token.contractAddress
+                                });
+                            }
+                        }
+                        
+                        // Add delay to avoid rate limiting
+                        await new Promise(resolve => setTimeout(resolve, 200));
+                    }
                 }
-
-                // Show warning if using fallback price
-                if (warningElement && price === 3500) {
-                    warningElement.classList.add('show');
+                
+                // Sort by value descending
+                allTokens.sort((a, b) => b.value - a.value);
+                
+                // Calculate total portfolio value
+                const totalValue = allTokens.reduce((sum, token) => sum + token.value, 0);
+                document.getElementById('total-portfolio-value').textContent = '$' + totalValue.toFixed(2);
+                
+                // Render tokens
+                renderTokens(allTokens);
+                
+                // Create chart
+                if (allTokens.length > 0) {
+                    createPortfolioChart(allTokens);
                 }
-
-                // Calculate and display historical data
-                historicalData = calculateHistoricalValues(transactions, balance, price);
-                createPortfolioChart(historicalData);
-
+                
                 console.log('Portfolio initialized successfully');
-
+                console.log('Total tokens:', allTokens.length);
+                
             } catch (error) {
                 console.error('Error initializing portfolio:', error);
-                
-                // Show error state with actual zero values
-                const balanceElement = document.getElementById('eth-balance');
-                const valueElement = document.getElementById('portfolio-value');
-                const warningElement = document.getElementById('api-warning');
-                
-                if (balanceElement) {
-                    balanceElement.textContent = '0.000000 ETH';
-                }
-                
-                if (valueElement) {
-                    valueElement.textContent = '$0.00';
-                }
-
-                if (warningElement) {
-                    warningElement.textContent = '⚠️ Error loading portfolio data. Please check console for details.';
-                    warningElement.classList.add('show');
-                }
-                
-                // Show empty chart
-                createPortfolioChart([
-                    { date: new Date(), value: 0 }
-                ]);
+                document.getElementById('eth-balance').textContent = '0.000000 ETH';
+                document.getElementById('total-portfolio-value').textContent = '$0.00';
             }
         }
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', initializePortfolio);
-
-        // Refresh data every 30 seconds
-        setInterval(initializePortfolio, 30000);
     </script>
 </body>
 </html>
