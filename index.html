@@ -719,7 +719,18 @@
                     'YFI': 'yearn-finance',
                     'BAL': 'balancer',
                     '1INCH': '1inch',
-                    'LDO': 'lido-dao'
+                    'LDO': 'lido-dao',
+                    'ELP': 'elp',
+                    'ARB': 'arbitrum',
+                    'OP': 'optimism',
+                    'MATIC': 'matic-network',
+                    'PEPE': 'pepe',
+                    'SHIB': 'shiba-inu',
+                    'APE': 'apecoin',
+                    'SAND': 'the-sandbox',
+                    'MANA': 'decentraland',
+                    'GRT': 'the-graph',
+                    'FTM': 'fantom'
                 };
                 
                 const tokenId = commonTokens[tokenSymbol.toUpperCase()] || tokenSymbol.toLowerCase();
@@ -739,29 +750,32 @@
             }
         }
 
-        // Fetch ETH price
-        async function fetchEthPrice() {
+        // Fetch native token price based on chain
+        async function fetchNativeTokenPrice(chainId) {
+            const priceMap = {
+                1: 'ethereum',      // ETH on Ethereum
+                8453: 'ethereum',   // ETH on Base
+                42161: 'ethereum',  // ETH on Arbitrum
+                10: 'ethereum',     // ETH on Optimism
+                137: 'matic-network' // MATIC on Polygon
+            };
+            
+            const tokenId = priceMap[chainId] || 'ethereum';
+            
             try {
-                const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
+                const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${tokenId}&vs_currencies=usd`);
                 const data = await response.json();
                 
-                if (data.ethereum?.usd) {
-                    return data.ethereum.usd;
+                if (data[tokenId]?.usd) {
+                    return data[tokenId].usd;
                 }
-                return 3500;
+                
+                // Fallback prices
+                if (chainId === 137) return 0.85; // MATIC approximate
+                return 3500; // ETH approximate
             } catch (error) {
-                console.error('Error fetching ETH price:', error);
-                // Fallback to Etherscan
-                try {
-                    const etherscanResponse = await fetch(`https://api.etherscan.io/v2/api?chainid=1&module=stats&action=ethprice&apikey=${API_KEY}`);
-                    const etherscanData = await etherscanResponse.json();
-                    
-                    if (etherscanData.status === '1' && etherscanData.result) {
-                        return parseFloat(etherscanData.result.ethusd);
-                    }
-                } catch (e) {
-                    console.error('Etherscan price fetch failed:', e);
-                }
+                console.error(`Error fetching price for chain ${chainId}:`, error);
+                if (chainId === 137) return 0.85;
                 return 3500;
             }
         }
@@ -910,68 +924,45 @@
         async function initializePortfolio() {
             try {
                 console.log('Initializing multi-chain portfolio...');
-                updateLoadingStatus('Fetching ETH price...');
-                
-                const ethPrice = await fetchEthPrice();
-                console.log('ETH Price:', ethPrice);
+                updateLoadingStatus('Fetching prices and balances...');
                 
                 allTokens = [];
                 
-                updateLoadingStatus('Fetching ETH balance...');
-                
-                // Fetch ETH balance on Ethereum mainnet
-                const ethBalance = await fetchNativeBalance(1);
-                const ethValue = ethBalance * ethPrice;
-                
-                document.getElementById('eth-balance').textContent = `${ethBalance.toFixed(6)} ETH ($${ethValue.toFixed(2)})`;
-                
-                if (ethValue >= 5) {
-                    allTokens.push({
-                        symbol: 'ETH',
-                        balance: ethBalance,
-                        price: ethPrice,
-                        value: ethValue,
-                        chain: 'Ethereum'
-                    });
-                }
-                
-                // Fetch ETH balance on Base network
-                updateLoadingStatus('Fetching Base ETH balance...');
-                const baseEthBalance = await fetchNativeBalance(8453); // Base chain ID
-                const baseEthValue = baseEthBalance * ethPrice;
-                
-                console.log(`Base ETH: ${baseEthBalance.toFixed(6)} ETH = $${baseEthValue.toFixed(2)}`);
-                
-                if (baseEthValue >= 5) {
-                    allTokens.push({
-                        symbol: 'ETH',
-                        balance: baseEthBalance,
-                        price: ethPrice,
-                        value: baseEthValue,
-                        chain: 'Base'
-                    });
-                }
-                
-                // Fetch ETH on other chains
-                const otherChains = [
-                    { chainId: 42161, name: 'Arbitrum' },
-                    { chainId: 10, name: 'Optimism' },
-                    { chainId: 137, name: 'Polygon' }
+                // Fetch native balances for all chains with correct prices
+                const chainsToCheck = [
+                    { chainId: 1, name: 'Ethereum', symbol: 'ETH' },
+                    { chainId: 8453, name: 'Base', symbol: 'ETH' },
+                    { chainId: 42161, name: 'Arbitrum', symbol: 'ETH' },
+                    { chainId: 10, name: 'Optimism', symbol: 'ETH' },
+                    { chainId: 137, name: 'Polygon', symbol: 'MATIC' }
                 ];
                 
-                for (const chain of otherChains) {
-                    const chainEthBalance = await fetchNativeBalance(chain.chainId);
-                    const chainEthValue = chainEthBalance * ethPrice;
+                for (const chain of chainsToCheck) {
+                    updateLoadingStatus(`Checking ${chain.symbol} on ${chain.name}...`);
                     
-                    if (chainEthValue >= 5) {
+                    const balance = await fetchNativeBalance(chain.chainId);
+                    const price = await fetchNativeTokenPrice(chain.chainId);
+                    const value = balance * price;
+                    
+                    console.log(`${chain.symbol} on ${chain.name}: ${balance.toFixed(6)} @ $${price} = $${value.toFixed(2)}`);
+                    
+                    // Update ETH balance display (Ethereum mainnet only)
+                    if (chain.chainId === 1) {
+                        document.getElementById('eth-balance').textContent = `${balance.toFixed(6)} ETH ($${value.toFixed(2)})`;
+                    }
+                    
+                    // Add to tokens if value >= $5
+                    if (value >= 5) {
                         allTokens.push({
-                            symbol: chain.chainId === 137 ? 'MATIC' : 'ETH',
-                            balance: chainEthBalance,
-                            price: ethPrice,
-                            value: chainEthValue,
+                            symbol: chain.symbol,
+                            balance: balance,
+                            price: price,
+                            value: value,
                             chain: chain.name
                         });
                     }
+                    
+                    await new Promise(resolve => setTimeout(resolve, 300));
                 }
                 
                 // Fetch tokens from all chains
@@ -983,8 +974,8 @@
                         const tokens = await fetchTokenBalances(chain.chainId);
                         console.log(`Found ${tokens.length} unique tokens on ${chain.name}`);
                         
-                        // Limit to first 20 tokens per chain to avoid too many API calls
-                        const limitedTokens = tokens.slice(0, 20);
+                        // Increase limit to 50 tokens per chain to catch more tokens
+                        const limitedTokens = tokens.slice(0, 50);
                         
                         // Get balance and price for each token
                         for (const token of limitedTokens) {
@@ -993,11 +984,11 @@
                                 
                                 const balance = await fetchTokenBalance(chain.chainId, token.contractAddress, token.tokenDecimal);
                                 
-                                if (balance > 0.0001) { // Minimum threshold
+                                if (balance > 0.00001) { // Lower threshold to catch small balances
                                     const price = await fetchTokenPrice(token.tokenSymbol, token.contractAddress, chain.chainId);
                                     const value = balance * price;
                                     
-                                    console.log(`${token.tokenSymbol} on ${chain.name}: ${balance.toFixed(4)} @ $${price} = $${value.toFixed(2)}`);
+                                    console.log(`${token.tokenSymbol} on ${chain.name}: ${balance.toFixed(6)} @ $${price} = $${value.toFixed(2)}`);
                                     
                                     // Only include tokens worth more than $5
                                     if (value >= 5) {
@@ -1018,8 +1009,8 @@
                                 console.log(`Error processing ${token.tokenSymbol}:`, tokenError.message);
                             }
                             
-                            // Add delay to avoid rate limiting
-                            await new Promise(resolve => setTimeout(resolve, 300));
+                            // Reduced delay for faster loading
+                            await new Promise(resolve => setTimeout(resolve, 250));
                         }
                     } catch (chainError) {
                         console.error(`Error fetching from ${chain.name}:`, chainError);
