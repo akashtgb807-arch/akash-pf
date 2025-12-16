@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Code2, ExternalLink, TrendingUp, Wallet, Send, Github, Mail } from 'lucide-react';
+import { Code2, ExternalLink, TrendingUp, Wallet, Send } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function Portfolio() {
@@ -8,7 +8,6 @@ export default function Portfolio() {
   const [portfolioValue, setPortfolioValue] = useState(null);
   const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   const ethAddress = '0x10dE74EBDFa84f5e6390a1A61DEad8d491754039';
   const apiKey = 'KGCJ6B1CEYAEQTC3BPR42HVGNXNHFA1537';
@@ -21,82 +20,47 @@ export default function Portfolio() {
 
   const fetchData = async () => {
     try {
-      setError(null);
-      
-      // Fetch ETH price first
-      const priceRes = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd');
-      if (!priceRes.ok) throw new Error('Failed to fetch ETH price');
-      
+      // Fetch both in parallel
+      const [priceRes, balanceRes] = await Promise.all([
+        fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd'),
+        fetch(`https://api.etherscan.io/api?module=account&action=balance&address=${ethAddress}&tag=latest&apikey=${apiKey}`)
+      ]);
+
       const priceData = await priceRes.json();
-      const currentPrice = priceData.ethereum.usd;
+      const balanceData = await balanceRes.json();
+
+      const currentPrice = priceData.ethereum?.usd || 0;
       setEthPrice(currentPrice);
 
-      // Fetch balance from Etherscan with API key
-      const balanceUrl = `https://api.etherscan.io/api?module=account&action=balance&address=${ethAddress}&tag=latest&apikey=${apiKey}`;
-      console.log('Fetching from:', balanceUrl);
+      // Parse balance - Etherscan returns wei, convert to ETH
+      const weiBalance = balanceData.result || '0';
+      const ethBalance = parseFloat(weiBalance) / 1000000000000000000;
+      setBalance(ethBalance);
       
-      const balanceRes = await fetch(balanceUrl);
-      if (!balanceRes.ok) throw new Error('Failed to fetch balance from Etherscan');
-      
-      const balanceData = await balanceRes.json();
-      console.log('Balance API Response:', balanceData);
-      
-      // Check if we got a valid response
-      if (balanceData.message === 'OK' && balanceData.result) {
-        const ethBalance = parseFloat(balanceData.result) / 1e18;
-        console.log('ETH Balance:', ethBalance);
-        setBalance(ethBalance);
-        
-        const value = ethBalance * currentPrice;
-        console.log('Portfolio Value:', value);
-        setPortfolioValue(value);
+      const value = ethBalance * currentPrice;
+      setPortfolioValue(value);
 
-        // Update chart data
-        setChartData(prev => {
-          const newData = [...prev, {
-            time: new Date().toLocaleTimeString('en-US', { 
-              hour: '2-digit', 
-              minute: '2-digit' 
-            }),
-            value: value,
-            price: currentPrice
-          }];
-          return newData.slice(-25);
-        });
-        
-        setLoading(false);
-      } else if (balanceData.message === 'NOTOK') {
-        console.error('Etherscan API Error:', balanceData.result);
-        setError(`API Error: ${balanceData.result}`);
-        setLoading(false);
-      } else {
-        // Still set the data even if balance is 0
-        setBalance(0);
-        setPortfolioValue(0);
-        setLoading(false);
-      }
-      
-    } catch (err) {
-      console.error('Error fetching data:', err);
-      setError(`Failed to load: ${err.message}`);
+      // Add to chart
+      setChartData(prev => {
+        const newPoint = {
+          time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+          value: value
+        };
+        const updated = [...prev, newPoint];
+        return updated.slice(-25);
+      });
+
+      setLoading(false);
+    } catch (error) {
+      console.error('Error:', error);
       setLoading(false);
     }
   };
 
   const skills = [
-    { name: 'Python', level: 90, color: 'bg-blue-500', gradient: 'from-blue-500 to-blue-600' },
-    { name: 'C++', level: 85, color: 'bg-purple-500', gradient: 'from-purple-500 to-purple-600' },
-    { name: 'JavaScript', level: 88, color: 'bg-yellow-500', gradient: 'from-yellow-500 to-yellow-600' }
-  ];
-
-  const projects = [
-    {
-      title: 'Buy/Sell Sessions Bot',
-      description: 'Advanced Telegram bot for automated trading session management with real-time notifications, secure transaction handling, and user-friendly interface. Features include session tracking, automated alerts, and comprehensive analytics.',
-      tags: ['Python', 'Telegram API', 'Automation', 'Database'],
-      link: 'https://t.me/buysellsessionsbot',
-      gradient: 'from-cyan-600 to-blue-600'
-    }
+    { name: 'Python', level: 90, gradient: 'from-blue-500 to-blue-600' },
+    { name: 'C++', level: 85, gradient: 'from-purple-500 to-purple-600' },
+    { name: 'JavaScript', level: 88, gradient: 'from-yellow-500 to-yellow-600' }
   ];
 
   return (
@@ -104,7 +68,7 @@ export default function Portfolio() {
       {/* Animated background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse delay-700"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '0.7s'}}></div>
       </div>
 
       <div className="relative">
@@ -130,18 +94,15 @@ export default function Portfolio() {
                 </p>
               </div>
               
-              {/* Contact Links */}
-              <div className="flex gap-4">
-                <a
-                  href="https://t.me/tgbakash"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white rounded-xl font-medium transition-all shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-105"
-                >
-                  <Send className="w-5 h-5" />
-                  Contact Me
-                </a>
-              </div>
+              <a
+                href="https://t.me/tgbakash"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white rounded-xl font-medium transition-all shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-105"
+              >
+                <Send className="w-5 h-5" />
+                Contact Me
+              </a>
             </div>
           </div>
         </header>
@@ -161,7 +122,6 @@ export default function Portfolio() {
                 <div 
                   key={skill.name}
                   className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700/50 hover:border-cyan-500/50 transition-all hover:shadow-lg hover:shadow-cyan-500/10 hover:scale-105"
-                  style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <h3 className="text-2xl font-bold text-white mb-4">{skill.name}</h3>
                   <div className="relative">
@@ -189,43 +149,38 @@ export default function Portfolio() {
               <h2 className="text-4xl font-bold text-white">Featured Projects</h2>
             </div>
 
-            <div className="grid grid-cols-1 gap-6">
-              {projects.map((project, index) => (
-                <div 
-                  key={index}
-                  className="group bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700/50 hover:border-purple-500/50 transition-all hover:shadow-2xl hover:shadow-purple-500/20"
-                >
-                  <div className="flex flex-col md:flex-row justify-between items-start gap-6">
-                    <div className="flex-1">
-                      <h3 className="text-3xl font-bold text-white mb-4 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-cyan-400 group-hover:to-purple-500 group-hover:bg-clip-text transition-all">
-                        {project.title}
-                      </h3>
-                      <p className="text-slate-300 text-lg leading-relaxed mb-6">
-                        {project.description}
-                      </p>
-                      <div className="flex flex-wrap gap-3">
-                        {project.tags.map((tag) => (
-                          <span 
-                            key={tag}
-                            className="px-4 py-2 bg-slate-700/50 text-cyan-300 rounded-lg text-sm font-medium border border-slate-600/50 hover:border-cyan-500/50 transition-colors"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    <a
-                      href={project.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={`flex items-center gap-3 px-8 py-4 bg-gradient-to-r ${project.gradient} hover:shadow-lg hover:shadow-cyan-500/30 text-white rounded-xl font-semibold transition-all hover:scale-105 whitespace-nowrap`}
-                    >
-                      View Project
-                      <ExternalLink className="w-5 h-5" />
-                    </a>
+            <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700/50 hover:border-purple-500/50 transition-all hover:shadow-2xl hover:shadow-purple-500/20">
+              <div className="flex flex-col md:flex-row justify-between items-start gap-6">
+                <div className="flex-1">
+                  <h3 className="text-3xl font-bold text-white mb-4">
+                    Buy/Sell Sessions Bot
+                  </h3>
+                  <p className="text-slate-300 text-lg leading-relaxed mb-6">
+                    Advanced Telegram bot for automated trading session management with real-time notifications, 
+                    secure transaction handling, and user-friendly interface. Features include session tracking, 
+                    automated alerts, and comprehensive analytics.
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    {['Python', 'Telegram API', 'Automation', 'Database'].map((tag) => (
+                      <span 
+                        key={tag}
+                        className="px-4 py-2 bg-slate-700/50 text-cyan-300 rounded-lg text-sm font-medium border border-slate-600/50 hover:border-cyan-500/50 transition-colors"
+                      >
+                        {tag}
+                      </span>
+                    ))}
                   </div>
                 </div>
-              ))}
+                <a
+                  href="https://t.me/buysellsessionsbot"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-cyan-600 to-blue-600 hover:shadow-lg hover:shadow-cyan-500/30 text-white rounded-xl font-semibold transition-all hover:scale-105 whitespace-nowrap"
+                >
+                  View Project
+                  <ExternalLink className="w-5 h-5" />
+                </a>
+              </div>
             </div>
           </section>
 
@@ -248,10 +203,6 @@ export default function Portfolio() {
                 <div className="text-center py-16">
                   <div className="animate-spin rounded-full h-16 w-16 border-4 border-slate-700 border-t-cyan-400 mx-auto"></div>
                   <p className="text-slate-400 mt-6 text-lg">Loading portfolio data...</p>
-                </div>
-              ) : error ? (
-                <div className="text-center py-16">
-                  <p className="text-red-400 text-lg">{error}</p>
                 </div>
               ) : (
                 <>
@@ -344,17 +295,15 @@ export default function Portfolio() {
                 <p className="text-slate-400">Full Stack Developer & Blockchain Enthusiast</p>
               </div>
               
-              <div className="flex items-center gap-4">
-                <a
-                  href="https://t.me/tgbakash"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-6 py-3 bg-slate-800/50 hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-400 rounded-xl transition-all border border-slate-700/50 hover:border-cyan-500/50"
-                >
-                  <Send className="w-5 h-5" />
-                  <span className="font-medium">Telegram</span>
-                </a>
-              </div>
+              <a
+                href="https://t.me/tgbakash"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-6 py-3 bg-slate-800/50 hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-400 rounded-xl transition-all border border-slate-700/50 hover:border-cyan-500/50"
+              >
+                <Send className="w-5 h-5" />
+                <span className="font-medium">Telegram</span>
+              </a>
             </div>
             
             <div className="mt-8 pt-8 border-t border-slate-800/50 text-center text-slate-400">
