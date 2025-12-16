@@ -145,6 +145,19 @@
             animation: fadeInUp 0.8s ease-out 0.4s backwards;
         }
 
+        .hero a:hover {
+            color: var(--accent-cyan);
+            transform: translateY(-2px);
+        }
+
+        .hero a svg {
+            transition: transform 0.3s ease;
+        }
+
+        .hero a:hover svg {
+            transform: scale(1.1);
+        }
+
         /* Skills Section */
         .skills-grid {
             display: grid;
@@ -454,17 +467,6 @@
             color: var(--text-secondary);
         }
 
-        .loading::after {
-            content: '...';
-            animation: dots 1.5s steps(4, end) infinite;
-        }
-
-        @keyframes dots {
-            0%, 20% { content: '.'; }
-            40% { content: '..'; }
-            60%, 100% { content: '...'; }
-        }
-
         /* Footer */
         footer {
             text-align: center;
@@ -508,22 +510,37 @@
     <main>
         <section class="hero">
             <h1>Developer & Trader</h1>
-            <p>Crafting intelligent solutions with Python, C++, and JavaScript. Building automated trading systems and blockchain applications.</p>
+            <p>Crafting intelligent solutions with Python, C++, and JavaScript. Building automated trading systems and blockchain applications with 2+ years of experience in crypto.</p>
+            
+            <div style="display: flex; gap: 1.5rem; justify-content: center; align-items: center; margin-top: 2rem;">
+                <a href="https://x.com/akashtgb8" target="_blank" style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary); text-decoration: none; font-size: 1.1rem; transition: color 0.3s ease;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                    Twitter
+                </a>
+                <a href="https://t.me/tgbakash" target="_blank" style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-primary); text-decoration: none; font-size: 1.1rem; transition: color 0.3s ease;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.654-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z"/>
+                    </svg>
+                    Telegram
+                </a>
+            </div>
         </section>
 
         <section class="skills-grid">
             <div class="skill-card">
-                <div class="skill-icon">🐍</div>
+                <div class="skill-icon">Py</div>
                 <h3>Python</h3>
                 <p>Expert in automation, data analysis, trading bots, and backend development. Building scalable solutions with modern frameworks.</p>
             </div>
             <div class="skill-card">
-                <div class="skill-icon">⚡</div>
+                <div class="skill-icon">C++</div>
                 <h3>C++</h3>
                 <p>High-performance computing, algorithmic trading, and system-level programming. Optimizing for speed and efficiency.</p>
             </div>
             <div class="skill-card">
-                <div class="skill-icon">🚀</div>
+                <div class="skill-icon">JS</div>
                 <h3>JavaScript</h3>
                 <p>Full-stack development with modern frameworks. Creating responsive web applications and interactive user interfaces.</p>
             </div>
@@ -591,7 +608,7 @@
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.869 4.326-2.96-.924c-.64-.203-.654-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.941z"/>
         </svg>
-        Contact
+        Telegram
     </a>
 
     <script>
