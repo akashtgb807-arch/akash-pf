@@ -1,317 +1,327 @@
-import React, { useState, useEffect } from 'react';
-import { Code2, ExternalLink, TrendingUp, Wallet, Send } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akash Portfolio - Developer & Blockchain Enthusiast</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 0.8; }
+        }
+        .animate-pulse-slow {
+            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white min-h-screen">
+    <!-- Animated Background -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse-slow"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse-slow" style="animation-delay: 0.7s;"></div>
+    </div>
 
-export default function Portfolio() {
-  const [ethPrice, setEthPrice] = useState(null);
-  const [balance, setBalance] = useState(null);
-  const [portfolioValue, setPortfolioValue] = useState(null);
-  const [chartData, setChartData] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const ethAddress = '0x10dE74EBDFa84f5e6390a1A61DEad8d491754039';
-  const apiKey = 'KGCJ6B1CEYAEQTC3BPR42HVGNXNHFA1537';
-
-  useEffect(() => {
-    fetchData();
-    const interval = setInterval(fetchData, 30000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const fetchData = async () => {
-    try {
-      // Fetch both in parallel
-      const [priceRes, balanceRes] = await Promise.all([
-        fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd'),
-        fetch(`https://api.etherscan.io/api?module=account&action=balance&address=${ethAddress}&tag=latest&apikey=${apiKey}`)
-      ]);
-
-      const priceData = await priceRes.json();
-      const balanceData = await balanceRes.json();
-
-      const currentPrice = priceData.ethereum?.usd || 0;
-      setEthPrice(currentPrice);
-
-      // Parse balance - Etherscan returns wei, convert to ETH
-      const weiBalance = balanceData.result || '0';
-      const ethBalance = parseFloat(weiBalance) / 1000000000000000000;
-      setBalance(ethBalance);
-      
-      const value = ethBalance * currentPrice;
-      setPortfolioValue(value);
-
-      // Add to chart
-      setChartData(prev => {
-        const newPoint = {
-          time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-          value: value
-        };
-        const updated = [...prev, newPoint];
-        return updated.slice(-25);
-      });
-
-      setLoading(false);
-    } catch (error) {
-      console.error('Error:', error);
-      setLoading(false);
-    }
-  };
-
-  const skills = [
-    { name: 'Python', level: 90, gradient: 'from-blue-500 to-blue-600' },
-    { name: 'C++', level: 85, gradient: 'from-purple-500 to-purple-600' },
-    { name: 'JavaScript', level: 88, gradient: 'from-yellow-500 to-yellow-600' }
-  ];
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
-      {/* Animated background */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" style={{animationDelay: '0.7s'}}></div>
-      </div>
-
-      <div className="relative">
-        {/* Hero Section */}
-        <header className="border-b border-slate-800/50 backdrop-blur-xl bg-slate-900/30">
-          <div className="max-w-7xl mx-auto px-6 py-16">
-            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
-              <div>
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-cyan-500/20">
-                    <Code2 className="w-8 h-8 text-white" />
-                  </div>
-                  <div>
-                    <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent">
-                      Akash Portfolio
-                    </h1>
-                    <p className="text-slate-400 text-lg mt-2">Full Stack Developer & Blockchain Enthusiast</p>
-                  </div>
+    <div class="relative">
+        <!-- Header -->
+        <header class="border-b border-slate-800/50 backdrop-blur-xl bg-slate-900/30">
+            <div class="max-w-7xl mx-auto px-6 py-16">
+                <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
+                    <div>
+                        <div class="flex items-center gap-4 mb-4">
+                            <div class="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h1 class="text-5xl md:text-6xl font-bold bg-gradient-to-r from-cyan-400 via-blue-500 to-purple-600 bg-clip-text text-transparent">
+                                    Akash Portfolio
+                                </h1>
+                                <p class="text-slate-400 text-lg mt-2">Full Stack Developer & Blockchain Enthusiast</p>
+                            </div>
+                        </div>
+                        <p class="text-slate-300 text-lg max-w-2xl leading-relaxed">
+                            Building innovative solutions with Python, C++, and JavaScript. Specializing in automation, 
+                            blockchain integration, and creating powerful tools for modern challenges.
+                        </p>
+                    </div>
+                    
+                    <a href="https://t.me/tgbakash" target="_blank" class="flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white rounded-xl font-medium transition-all shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-105">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                        </svg>
+                        Contact Me
+                    </a>
                 </div>
-                <p className="text-slate-300 text-lg max-w-2xl leading-relaxed">
-                  Building innovative solutions with Python, C++, and JavaScript. Specializing in automation, 
-                  blockchain integration, and creating powerful tools for modern challenges.
-                </p>
-              </div>
-              
-              <a
-                href="https://t.me/tgbakash"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white rounded-xl font-medium transition-all shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 hover:scale-105"
-              >
-                <Send className="w-5 h-5" />
-                Contact Me
-              </a>
             </div>
-          </div>
         </header>
 
-        <div className="max-w-7xl mx-auto px-6 py-16 space-y-16">
-          {/* Skills Section */}
-          <section>
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-cyan-500/20 to-blue-600/20 rounded-xl flex items-center justify-center border border-cyan-500/30">
-                <Code2 className="w-6 h-6 text-cyan-400" />
-              </div>
-              <h2 className="text-4xl font-bold text-white">Technical Expertise</h2>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {skills.map((skill, index) => (
-                <div 
-                  key={skill.name}
-                  className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700/50 hover:border-cyan-500/50 transition-all hover:shadow-lg hover:shadow-cyan-500/10 hover:scale-105"
-                >
-                  <h3 className="text-2xl font-bold text-white mb-4">{skill.name}</h3>
-                  <div className="relative">
-                    <div className="w-full bg-slate-700/50 rounded-full h-4 overflow-hidden">
-                      <div
-                        className={`h-full bg-gradient-to-r ${skill.gradient} rounded-full transition-all duration-1000 ease-out shadow-lg`}
-                        style={{ width: `${skill.level}%` }}
-                      />
+        <div class="max-w-7xl mx-auto px-6 py-16 space-y-16">
+            <!-- Skills Section -->
+            <section>
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-12 h-12 bg-gradient-to-br from-cyan-500/20 to-blue-600/20 rounded-xl flex items-center justify-center border border-cyan-500/30">
+                        <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                        </svg>
                     </div>
-                    <span className="absolute -top-8 right-0 text-3xl font-bold text-cyan-400">
-                      {skill.level}%
-                    </span>
-                  </div>
+                    <h2 class="text-4xl font-bold">Technical Expertise</h2>
                 </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Projects Section */}
-          <section>
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-500/20 to-pink-600/20 rounded-xl flex items-center justify-center border border-purple-500/30">
-                <ExternalLink className="w-6 h-6 text-purple-400" />
-              </div>
-              <h2 className="text-4xl font-bold text-white">Featured Projects</h2>
-            </div>
-
-            <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700/50 hover:border-purple-500/50 transition-all hover:shadow-2xl hover:shadow-purple-500/20">
-              <div className="flex flex-col md:flex-row justify-between items-start gap-6">
-                <div className="flex-1">
-                  <h3 className="text-3xl font-bold text-white mb-4">
-                    Buy/Sell Sessions Bot
-                  </h3>
-                  <p className="text-slate-300 text-lg leading-relaxed mb-6">
-                    Advanced Telegram bot for automated trading session management with real-time notifications, 
-                    secure transaction handling, and user-friendly interface. Features include session tracking, 
-                    automated alerts, and comprehensive analytics.
-                  </p>
-                  <div className="flex flex-wrap gap-3">
-                    {['Python', 'Telegram API', 'Automation', 'Database'].map((tag) => (
-                      <span 
-                        key={tag}
-                        className="px-4 py-2 bg-slate-700/50 text-cyan-300 rounded-lg text-sm font-medium border border-slate-600/50 hover:border-cyan-500/50 transition-colors"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700/50 hover:border-cyan-500/50 transition-all hover:shadow-lg hover:shadow-cyan-500/10 hover:scale-105">
+                        <h3 class="text-2xl font-bold mb-4">Python</h3>
+                        <div class="relative">
+                            <div class="w-full bg-slate-700/50 rounded-full h-4 overflow-hidden">
+                                <div class="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-1000 ease-out shadow-lg" style="width: 90%"></div>
+                            </div>
+                            <span class="absolute -top-8 right-0 text-3xl font-bold text-cyan-400">90%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700/50 hover:border-cyan-500/50 transition-all hover:shadow-lg hover:shadow-cyan-500/10 hover:scale-105">
+                        <h3 class="text-2xl font-bold mb-4">C++</h3>
+                        <div class="relative">
+                            <div class="w-full bg-slate-700/50 rounded-full h-4 overflow-hidden">
+                                <div class="h-full bg-gradient-to-r from-purple-500 to-purple-600 rounded-full transition-all duration-1000 ease-out shadow-lg" style="width: 85%"></div>
+                            </div>
+                            <span class="absolute -top-8 right-0 text-3xl font-bold text-cyan-400">85%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700/50 hover:border-cyan-500/50 transition-all hover:shadow-lg hover:shadow-cyan-500/10 hover:scale-105">
+                        <h3 class="text-2xl font-bold mb-4">JavaScript</h3>
+                        <div class="relative">
+                            <div class="w-full bg-slate-700/50 rounded-full h-4 overflow-hidden">
+                                <div class="h-full bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-full transition-all duration-1000 ease-out shadow-lg" style="width: 88%"></div>
+                            </div>
+                            <span class="absolute -top-8 right-0 text-3xl font-bold text-cyan-400">88%</span>
+                        </div>
+                    </div>
                 </div>
-                <a
-                  href="https://t.me/buysellsessionsbot"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-cyan-600 to-blue-600 hover:shadow-lg hover:shadow-cyan-500/30 text-white rounded-xl font-semibold transition-all hover:scale-105 whitespace-nowrap"
-                >
-                  View Project
-                  <ExternalLink className="w-5 h-5" />
-                </a>
-              </div>
-            </div>
-          </section>
+            </section>
 
-          {/* Portfolio Section */}
-          <section>
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-12 h-12 bg-gradient-to-br from-green-500/20 to-emerald-600/20 rounded-xl flex items-center justify-center border border-green-500/30">
-                <Wallet className="w-6 h-6 text-green-400" />
-              </div>
-              <h2 className="text-4xl font-bold text-white">Crypto Portfolio</h2>
-            </div>
-            
-            <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700/50">
-              <div className="mb-8 p-6 bg-slate-900/50 rounded-xl border border-slate-700/50">
-                <p className="text-sm text-slate-400 mb-2 font-medium">Ethereum Address</p>
-                <p className="text-sm font-mono text-cyan-400 break-all tracking-wide">{ethAddress}</p>
-              </div>
-
-              {loading ? (
-                <div className="text-center py-16">
-                  <div className="animate-spin rounded-full h-16 w-16 border-4 border-slate-700 border-t-cyan-400 mx-auto"></div>
-                  <p className="text-slate-400 mt-6 text-lg">Loading portfolio data...</p>
+            <!-- Projects Section -->
+            <section>
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-12 h-12 bg-gradient-to-br from-purple-500/20 to-pink-600/20 rounded-xl flex items-center justify-center border border-purple-500/30">
+                        <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                        </svg>
+                    </div>
+                    <h2 class="text-4xl font-bold">Featured Projects</h2>
                 </div>
-              ) : (
-                <>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div className="bg-gradient-to-br from-blue-900/30 to-cyan-900/30 rounded-xl p-8 border border-blue-500/30 hover:border-blue-400/50 transition-all hover:shadow-lg hover:shadow-blue-500/20">
-                      <p className="text-slate-400 text-sm mb-2 font-medium">ETH Balance</p>
-                      <p className="text-4xl font-bold text-cyan-400">
-                        {balance !== null ? balance.toFixed(6) : '0.000000'} ETH
-                      </p>
-                    </div>
-                    <div className="bg-gradient-to-br from-green-900/30 to-emerald-900/30 rounded-xl p-8 border border-green-500/30 hover:border-green-400/50 transition-all hover:shadow-lg hover:shadow-green-500/20">
-                      <p className="text-slate-400 text-sm mb-2 font-medium">ETH Price</p>
-                      <p className="text-4xl font-bold text-green-400">
-                        ${ethPrice ? ethPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00'}
-                      </p>
-                    </div>
-                    <div className="bg-gradient-to-br from-purple-900/30 to-pink-900/30 rounded-xl p-8 border border-purple-500/30 hover:border-purple-400/50 transition-all hover:shadow-lg hover:shadow-purple-500/20">
-                      <p className="text-slate-400 text-sm mb-2 font-medium">Total Value</p>
-                      <p className="text-4xl font-bold text-purple-400">
-                        ${portfolioValue !== null ? portfolioValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00'}
-                      </p>
-                    </div>
-                  </div>
 
-                  {chartData.length > 1 && (
-                    <div className="bg-slate-900/50 rounded-xl p-8 border border-slate-700/50">
-                      <h3 className="text-2xl font-semibold mb-6 flex items-center gap-3 text-white">
-                        <TrendingUp className="w-6 h-6 text-cyan-400" />
-                        Portfolio Value Trend
-                      </h3>
-                      <ResponsiveContainer width="100%" height={350}>
-                        <LineChart data={chartData}>
-                          <defs>
-                            <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#06B6D4" stopOpacity={0.3}/>
-                              <stop offset="95%" stopColor="#06B6D4" stopOpacity={0}/>
-                            </linearGradient>
-                          </defs>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                          <XAxis 
-                            dataKey="time" 
-                            stroke="#94A3B8"
-                            style={{ fontSize: '14px' }}
-                            tick={{ fill: '#94A3B8' }}
-                          />
-                          <YAxis 
-                            stroke="#94A3B8"
-                            style={{ fontSize: '14px' }}
-                            tick={{ fill: '#94A3B8' }}
-                            tickFormatter={(value) => `$${value.toFixed(2)}`}
-                          />
-                          <Tooltip
-                            contentStyle={{
-                              backgroundColor: '#0F172A',
-                              border: '1px solid #334155',
-                              borderRadius: '12px',
-                              color: '#fff',
-                              padding: '12px'
-                            }}
-                            formatter={(value) => [`$${Number(value).toFixed(2)}`, 'Portfolio Value']}
-                            labelStyle={{ color: '#94A3B8' }}
-                          />
-                          <Line 
-                            type="monotone" 
-                            dataKey="value" 
-                            stroke="#06B6D4" 
-                            strokeWidth={3}
-                            dot={{ fill: '#06B6D4', r: 5, strokeWidth: 2, stroke: '#0F172A' }}
-                            activeDot={{ r: 7, strokeWidth: 2 }}
-                            fill="url(#colorValue)"
-                          />
-                        </LineChart>
-                      </ResponsiveContainer>
+                <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700/50 hover:border-purple-500/50 transition-all hover:shadow-2xl hover:shadow-purple-500/20">
+                    <div class="flex flex-col md:flex-row justify-between items-start gap-6">
+                        <div class="flex-1">
+                            <h3 class="text-3xl font-bold mb-4">Buy/Sell Sessions Bot</h3>
+                            <p class="text-slate-300 text-lg leading-relaxed mb-6">
+                                Advanced Telegram bot for automated trading session management with real-time notifications, 
+                                secure transaction handling, and user-friendly interface. Features include session tracking, 
+                                automated alerts, and comprehensive analytics.
+                            </p>
+                            <div class="flex flex-wrap gap-3">
+                                <span class="px-4 py-2 bg-slate-700/50 text-cyan-300 rounded-lg text-sm font-medium border border-slate-600/50">Python</span>
+                                <span class="px-4 py-2 bg-slate-700/50 text-cyan-300 rounded-lg text-sm font-medium border border-slate-600/50">Telegram API</span>
+                                <span class="px-4 py-2 bg-slate-700/50 text-cyan-300 rounded-lg text-sm font-medium border border-slate-600/50">Automation</span>
+                                <span class="px-4 py-2 bg-slate-700/50 text-cyan-300 rounded-lg text-sm font-medium border border-slate-600/50">Database</span>
+                            </div>
+                        </div>
+                        <a href="https://t.me/buysellsessionsbot" target="_blank" class="flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-cyan-600 to-blue-600 hover:shadow-lg hover:shadow-cyan-500/30 text-white rounded-xl font-semibold transition-all hover:scale-105 whitespace-nowrap">
+                            View Project
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                            </svg>
+                        </a>
                     </div>
-                  )}
-                </>
-              )}
-            </div>
-          </section>
+                </div>
+            </section>
+
+            <!-- Portfolio Section -->
+            <section>
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-12 h-12 bg-gradient-to-br from-green-500/20 to-emerald-600/20 rounded-xl flex items-center justify-center border border-green-500/30">
+                        <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                        </svg>
+                    </div>
+                    <h2 class="text-4xl font-bold">Crypto Portfolio</h2>
+                </div>
+                
+                <div class="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700/50">
+                    <div class="mb-8 p-6 bg-slate-900/50 rounded-xl border border-slate-700/50">
+                        <p class="text-sm text-slate-400 mb-2 font-medium">Ethereum Address</p>
+                        <p class="text-sm font-mono text-cyan-400 break-all tracking-wide">0x10dE74EBDFa84f5e6390a1A61DEad8d491754039</p>
+                    </div>
+
+                    <div id="loading" class="text-center py-16">
+                        <div class="animate-spin rounded-full h-16 w-16 border-4 border-slate-700 border-t-cyan-400 mx-auto"></div>
+                        <p class="text-slate-400 mt-6 text-lg">Loading portfolio data...</p>
+                    </div>
+
+                    <div id="portfolio-data" class="hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                            <div class="bg-gradient-to-br from-blue-900/30 to-cyan-900/30 rounded-xl p-8 border border-blue-500/30">
+                                <p class="text-slate-400 text-sm mb-2 font-medium">ETH Balance</p>
+                                <p id="eth-balance" class="text-4xl font-bold text-cyan-400">0.000000 ETH</p>
+                            </div>
+                            <div class="bg-gradient-to-br from-green-900/30 to-emerald-900/30 rounded-xl p-8 border border-green-500/30">
+                                <p class="text-slate-400 text-sm mb-2 font-medium">ETH Price</p>
+                                <p id="eth-price" class="text-4xl font-bold text-green-400">$0.00</p>
+                            </div>
+                            <div class="bg-gradient-to-br from-purple-900/30 to-pink-900/30 rounded-xl p-8 border border-purple-500/30">
+                                <p class="text-slate-400 text-sm mb-2 font-medium">Total Value</p>
+                                <p id="portfolio-value" class="text-4xl font-bold text-purple-400">$0.00</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-900/50 rounded-xl p-8 border border-slate-700/50">
+                            <h3 class="text-2xl font-semibold mb-6 flex items-center gap-3">
+                                <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                                </svg>
+                                Portfolio Value Trend
+                            </h3>
+                            <canvas id="portfolio-chart" class="w-full" height="350"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
 
-        {/* Footer */}
-        <footer className="border-t border-slate-800/50 backdrop-blur-xl bg-slate-900/30 mt-24">
-          <div className="max-w-7xl mx-auto px-6 py-12">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-              <div className="text-center md:text-left">
-                <h3 className="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent mb-2">
-                  Akash Portfolio
-                </h3>
-                <p className="text-slate-400">Full Stack Developer & Blockchain Enthusiast</p>
-              </div>
-              
-              <a
-                href="https://t.me/tgbakash"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-6 py-3 bg-slate-800/50 hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-400 rounded-xl transition-all border border-slate-700/50 hover:border-cyan-500/50"
-              >
-                <Send className="w-5 h-5" />
-                <span className="font-medium">Telegram</span>
-              </a>
+        <!-- Footer -->
+        <footer class="border-t border-slate-800/50 backdrop-blur-xl bg-slate-900/30 mt-24">
+            <div class="max-w-7xl mx-auto px-6 py-12">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div class="text-center md:text-left">
+                        <h3 class="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent mb-2">
+                            Akash Portfolio
+                        </h3>
+                        <p class="text-slate-400">Full Stack Developer & Blockchain Enthusiast</p>
+                    </div>
+                    
+                    <a href="https://t.me/tgbakash" target="_blank" class="flex items-center gap-2 px-6 py-3 bg-slate-800/50 hover:bg-cyan-500/20 text-slate-300 hover:text-cyan-400 rounded-xl transition-all border border-slate-700/50 hover:border-cyan-500/50">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                        </svg>
+                        <span class="font-medium">Telegram</span>
+                    </a>
+                </div>
+                
+                <div class="mt-8 pt-8 border-t border-slate-800/50 text-center text-slate-400">
+                    <p>© 2024 Akash Portfolio. All rights reserved.</p>
+                </div>
             </div>
-            
-            <div className="mt-8 pt-8 border-t border-slate-800/50 text-center text-slate-400">
-              <p>© 2024 Akash Portfolio. All rights reserved.</p>
-            </div>
-          </div>
         </footer>
-      </div>
     </div>
-  );
-}
+
+    <script>
+        const ETH_ADDRESS = '0x10dE74EBDFa84f5e6390a1A61DEad8d491754039';
+        const API_KEY = 'KGCJ6B1CEYAEQTC3BPR42HVGNXNHFA1537';
+        
+        let chart = null;
+        let chartData = { labels: [], values: [] };
+
+        async function fetchPortfolioData() {
+            try {
+                const [priceRes, balanceRes] = await Promise.all([
+                    fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd'),
+                    fetch(`https://api.etherscan.io/api?module=account&action=balance&address=${ETH_ADDRESS}&tag=latest&apikey=${API_KEY}`)
+                ]);
+
+                const priceData = await priceRes.json();
+                const balanceData = await balanceRes.json();
+
+                const ethPrice = priceData.ethereum.usd;
+                const ethBalance = parseFloat(balanceData.result || '0') / 1e18;
+                const portfolioValue = ethBalance * ethPrice;
+
+                document.getElementById('eth-balance').textContent = ethBalance.toFixed(6) + ' ETH';
+                document.getElementById('eth-price').textContent = '$' + ethPrice.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                document.getElementById('portfolio-value').textContent = '$' + portfolioValue.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('portfolio-data').classList.remove('hidden');
+
+                updateChart(portfolioValue);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        function updateChart(value) {
+            const time = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            
+            chartData.labels.push(time);
+            chartData.values.push(value);
+            
+            if (chartData.labels.length > 25) {
+                chartData.labels.shift();
+                chartData.values.shift();
+            }
+
+            if (!chart) {
+                const ctx = document.getElementById('portfolio-chart').getContext('2d');
+                chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: chartData.labels,
+                        datasets: [{
+                            label: 'Portfolio Value',
+                            data: chartData.values,
+                            borderColor: '#06B6D4',
+                            backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#06B6D4',
+                            pointBorderColor: '#0F172A',
+                            pointBorderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#0F172A',
+                                borderColor: '#334155',
+                                borderWidth: 1,
+                                padding: 12,
+                                callbacks: {
+                                    label: (context) => '$' + context.parsed.y.toFixed(2)
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { color: '#334155' },
+                                ticks: { color: '#94A3B8' }
+                            },
+                            y: {
+                                grid: { color: '#334155' },
+                                ticks: {
+                                    color: '#94A3B8',
+                                    callback: (value) => '$' + value.toFixed(2)
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                chart.data.labels = chartData.labels;
+                chart.data.datasets[0].data = chartData.values;
+                chart.update();
+            }
+        }
+
+        fetchPortfolioData();
+        setInterval(fetchPortfolioData, 30000);
+    </script>
+</body>
+</html>
