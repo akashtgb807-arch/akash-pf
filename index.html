@@ -814,25 +814,37 @@
                 portfolioChart.destroy();
             }
             
-            // Generate historical data points (last 30 days)
+            // Generate historical data points (last 90 days - 3 months)
             const now = Date.now();
             const historicalData = [];
             
-            for (let i = 30; i >= 0; i--) {
+            for (let i = 90; i >= 0; i--) {
                 const date = new Date(now - i * 24 * 60 * 60 * 1000);
-                // Simulate growth with some variance
-                const variance = 0.85 + (Math.random() * 0.3); // Random between 0.85 and 1.15
-                const value = totalValue * variance;
+                // Simulate growth with realistic variance
+                const dayProgress = (90 - i) / 90; // 0 to 1
+                const growthFactor = 0.7 + (dayProgress * 0.3); // Start at 70%, grow to 100%
+                const randomness = 0.95 + (Math.random() * 0.1); // ±5% variance
+                const value = totalValue * growthFactor * randomness;
                 historicalData.push({
                     date: date,
                     value: value
                 });
             }
             
+            // Calculate Y-axis range with padding
+            const values = historicalData.map(d => d.value);
+            const minValue = Math.min(...values);
+            const maxValue = Math.max(...values);
+            const range = maxValue - minValue;
+            const padding = range * 0.15; // 15% padding on top and bottom
+            
+            const yMin = Math.max(0, minValue - padding);
+            const yMax = maxValue + padding;
+            
             portfolioChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: historicalData.map(d => d.date.toLocaleDateString()),
+                    labels: historicalData.map(d => d.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
                     datasets: [{
                         label: 'Portfolio Value (USD)',
                         data: historicalData.map(d => d.value),
@@ -880,7 +892,8 @@
                     scales: {
                         x: {
                             grid: {
-                                color: 'rgba(255, 255, 255, 0.05)'
+                                color: 'rgba(255, 255, 255, 0.05)',
+                                drawBorder: false
                             },
                             ticks: {
                                 color: '#94a3b8',
@@ -889,12 +902,16 @@
                                     size: 10
                                 },
                                 maxRotation: 45,
-                                minRotation: 45
+                                minRotation: 45,
+                                maxTicksLimit: 15 // Limit number of x-axis labels
                             }
                         },
                         y: {
+                            min: yMin,
+                            max: yMax,
                             grid: {
-                                color: 'rgba(255, 255, 255, 0.05)'
+                                color: 'rgba(255, 255, 255, 0.05)',
+                                drawBorder: false
                             },
                             ticks: {
                                 color: '#94a3b8',
@@ -903,7 +920,8 @@
                                 },
                                 callback: function(value) {
                                     return '$' + value.toFixed(0);
-                                }
+                                },
+                                padding: 10
                             }
                         }
                     },
