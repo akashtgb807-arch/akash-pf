@@ -133,6 +133,34 @@
             background: rgba(255, 255, 255, 0.2);
         }
 
+        .contact-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #0088cc, #00a0e9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 20px rgba(0, 136, 204, 0.4);
+            transition: all 0.3s;
+            z-index: 999;
+            text-decoration: none;
+        }
+
+        .contact-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(0, 136, 204, 0.6);
+        }
+
+        .contact-btn svg {
+            width: 30px;
+            height: 30px;
+            fill: white;
+        }
+
         .skills-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -410,7 +438,7 @@
 
             <div class="address-card">
                 <div class="stat-label">Ethereum Address</div>
-                <div class="address-text">0x10dE74EBDFa84f5e6390a1A61DEad8d491754039</div>
+                <div class="address-text">0x10dE...4039</div>
                 <div class="timestamp">Last updated: <span id="lastUpdate">-</span></div>
             </div>
         </div>
@@ -423,6 +451,12 @@
             <a href="https://etherscan.io/address/0x10dE74EBDFa84f5e6390a1A61DEad8d491754039" target="_blank">Etherscan</a>
         </div>
     </footer>
+
+    <a href="https://t.me/tgbakash" target="_blank" class="contact-btn" title="Contact me on Telegram">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.18.717-3.146 10.923-3.146 10.923-.203.842-.738.842-1.238.518l-3.397-2.509-1.635 1.576c-.18.18-.33.33-.675.33l.24-3.397 6.193-5.592c.27-.24-.06-.375-.42-.135L7.63 13.863l-3.278-1.024c-.713-.225-.727-.713.15-1.054l12.822-4.945c.592-.225 1.11.135.917 1.054z"/>
+        </svg>
+    </a>
 
     <script>
         var ETH_ADDRESS = '0x10dE74EBDFa84f5e6390a1A61DEad8d491754039';
@@ -444,17 +478,210 @@
                 var priceData = results[1];
                 var historyData = results[2];
                 
-                if (!balanceData.result) {
-                    throw new Error('Invalid balance data');
+                console.log('Balance data:', balanceData);
+                console.log('Price data:', priceData);
+                
+                if (!balanceData.result || balanceData.status === '0') {
+                    throw new Error('API Error: ' + (balanceData.message || 'Invalid balance data'));
                 }
                 
                 var ethBalance = parseFloat(balanceData.result) / 1000000000000000000;
                 var ethPrice = priceData.ethereum.usd;
                 var totalValue = ethBalance * ethPrice;
                 
+                if (isNaN(ethBalance) || isNaN(ethPrice)) {
+                    throw new Error('Calculation error: balance=' + ethBalance + ', price=' + ethPrice);
+                }
+                
                 document.getElementById('ethBalance').textContent = ethBalance.toFixed(4) + ' ETH';
-                document.getElementById('ethPrice').textContent = '$' + Math.round(ethPrice).toLocaleString();
-                document.getElementById('totalValue').textContent = '$' + Math.round(totalValue).toLocaleString();
+                document.getElementById('ethPrice').textContent = '
+
+        function createChart(priceHistory, ethBalance) {
+            var ctx = document.getElementById('portfolioChart');
+            var labels = [];
+            var portfolioValues = [];
+            
+            for (var i = 0; i < priceHistory.length; i++) {
+                var date = new Date(priceHistory[i][0]);
+                var month = date.toLocaleDateString('en-US', { month: 'short' });
+                var day = date.getDate();
+                labels.push(month + ' ' + day);
+                portfolioValues.push(priceHistory[i][1] * ethBalance);
+            }
+            
+            if (portfolioChart) {
+                portfolioChart.destroy();
+            }
+            
+            portfolioChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Portfolio Value',
+                        data: portfolioValues,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 3,
+                        pointHoverRadius: 6,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            callbacks: {
+                                label: function(context) {
+                                    return '$' + Math.round(context.parsed.y).toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                color: '#94a3b8',
+                                callback: function(value) {
+                                    return '$' + Math.round(value).toLocaleString();
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(148, 163, 184, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#94a3b8'
+                            },
+                            grid: {
+                                color: 'rgba(148, 163, 184, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        var links = document.querySelectorAll('a[href^="#"]');
+        for (var i = 0; i < links.length; i++) {
+            links[i].addEventListener('click', function(e) {
+                e.preventDefault();
+                var targetId = this.getAttribute('href');
+                var target = document.querySelector(targetId);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        }
+
+        fetchPortfolioData();
+        setInterval(fetchPortfolioData, 120000);
+    </script>
+</body>
+</html> + Math.round(ethPrice).toLocaleString();
+                document.getElementById('totalValue').textContent = '
+
+        function createChart(priceHistory, ethBalance) {
+            var ctx = document.getElementById('portfolioChart');
+            var labels = [];
+            var portfolioValues = [];
+            
+            for (var i = 0; i < priceHistory.length; i++) {
+                var date = new Date(priceHistory[i][0]);
+                var month = date.toLocaleDateString('en-US', { month: 'short' });
+                var day = date.getDate();
+                labels.push(month + ' ' + day);
+                portfolioValues.push(priceHistory[i][1] * ethBalance);
+            }
+            
+            if (portfolioChart) {
+                portfolioChart.destroy();
+            }
+            
+            portfolioChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Portfolio Value',
+                        data: portfolioValues,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 3,
+                        pointHoverRadius: 6,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            callbacks: {
+                                label: function(context) {
+                                    return '$' + Math.round(context.parsed.y).toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                color: '#94a3b8',
+                                callback: function(value) {
+                                    return '$' + Math.round(value).toLocaleString();
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(148, 163, 184, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#94a3b8'
+                            },
+                            grid: {
+                                color: 'rgba(148, 163, 184, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        var links = document.querySelectorAll('a[href^="#"]');
+        for (var i = 0; i < links.length; i++) {
+            links[i].addEventListener('click', function(e) {
+                e.preventDefault();
+                var targetId = this.getAttribute('href');
+                var target = document.querySelector(targetId);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        }
+
+        fetchPortfolioData();
+        setInterval(fetchPortfolioData, 120000);
+    </script>
+</body>
+</html> + Math.round(totalValue).toLocaleString();
                 document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
                 
                 createChart(historyData.prices, ethBalance);
@@ -464,7 +691,7 @@
             })
             .catch(function(error) {
                 console.error('Error:', error);
-                document.getElementById('loading').innerHTML = '<p style="color: #f87171;">Failed to load portfolio data. Error: ' + error.message + '</p>';
+                document.getElementById('loading').innerHTML = '<p style="color: #f87171;">Failed to load portfolio data.<br>Error: ' + error.message + '<br>Check browser console for details.</p>';
             });
         }
 
