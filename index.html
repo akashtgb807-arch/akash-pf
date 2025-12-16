@@ -6,12 +6,7 @@
     <title>Akash - Developer Portfolio</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #1e293b);
@@ -20,13 +15,11 @@
             color: white;
             min-height: 100vh;
         }
-
         @keyframes gradient {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
             100% { background-position: 0% 50%; }
         }
-
         nav {
             position: fixed;
             top: 0;
@@ -38,7 +31,6 @@
             z-index: 1000;
             padding: 1.5rem 2rem;
         }
-
         .nav-content {
             max-width: 1200px;
             margin: 0 auto;
@@ -46,64 +38,16 @@
             justify-content: space-between;
             align-items: center;
         }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .nav-links a:hover {
-            color: #60a5fa;
-        }
-
-        section {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 6rem 2rem;
-        }
-
-        .hero {
-            text-align: center;
-            padding-top: 10rem;
-        }
-
-        h1 {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            font-weight: 800;
-        }
-
-        h2 {
-            font-size: 2rem;
-            margin-bottom: 3rem;
-            font-weight: 700;
-        }
-
-        .subtitle {
-            font-size: 1.5rem;
-            color: #94a3b8;
-            margin-bottom: 2rem;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin-top: 2rem;
-        }
-
+        .logo { font-size: 1.5rem; font-weight: bold; }
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { color: white; text-decoration: none; transition: color 0.3s; }
+        .nav-links a:hover { color: #60a5fa; }
+        section { max-width: 1200px; margin: 0 auto; padding: 6rem 2rem; }
+        .hero { text-align: center; padding-top: 10rem; }
+        h1 { font-size: 4rem; margin-bottom: 1rem; font-weight: 800; }
+        h2 { font-size: 2rem; margin-bottom: 3rem; font-weight: 700; }
+        .subtitle { font-size: 1.5rem; color: #94a3b8; margin-bottom: 2rem; }
+        .btn-group { display: flex; gap: 1rem; justify-center; flex-wrap: wrap; margin-top: 2rem; }
         .btn {
             padding: 1rem 2rem;
             border-radius: 0.5rem;
@@ -112,27 +56,10 @@
             transition: all 0.3s;
             display: inline-block;
         }
-
-        .btn-primary {
-            background: #3b82f6;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #2563eb;
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
+        .btn-primary { background: #3b82f6; color: white; }
+        .btn-primary:hover { background: #2563eb; transform: translateY(-2px); }
+        .btn-secondary { background: rgba(255, 255, 255, 0.1); color: white; border: 1px solid rgba(255, 255, 255, 0.2); }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.2); }
         .contact-btn {
             position: fixed;
             bottom: 2rem;
@@ -149,25 +76,9 @@
             z-index: 999;
             text-decoration: none;
         }
-
-        .contact-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 30px rgba(0, 136, 204, 0.6);
-        }
-
-        .contact-btn svg {
-            width: 30px;
-            height: 30px;
-            fill: white;
-        }
-
-        .skills-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-
+        .contact-btn:hover { transform: scale(1.1); box-shadow: 0 6px 30px rgba(0, 136, 204, 0.6); }
+        .contact-btn svg { width: 30px; height: 30px; fill: white; }
+        .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem; margin-top: 3rem; }
         .skill-card {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
@@ -177,26 +88,10 @@
             text-align: center;
             transition: all 0.3s;
         }
-
-        .skill-card:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateY(-5px);
-        }
-
-        .skill-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        .skill-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .skill-card p {
-            color: #94a3b8;
-        }
-
+        .skill-card:hover { background: rgba(255, 255, 255, 0.1); transform: translateY(-5px); }
+        .skill-icon { font-size: 3rem; margin-bottom: 1rem; }
+        .skill-card h3 { font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .skill-card p { color: #94a3b8; }
         .project-card {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
@@ -205,44 +100,12 @@
             padding: 2.5rem;
             margin-top: 2rem;
         }
-
-        .project-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-        }
-
-        .project-card h3 {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-        }
-
-        .project-card p {
-            color: #cbd5e1;
-            line-height: 1.6;
-            margin-bottom: 1.5rem;
-        }
-
-        .tags {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-            margin-bottom: 1.5rem;
-        }
-
-        .tag {
-            background: rgba(59, 130, 246, 0.2);
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-        }
-
-        .portfolio-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
+        .project-icon { font-size: 3rem; margin-bottom: 1rem; }
+        .project-card h3 { font-size: 2rem; margin-bottom: 1rem; }
+        .project-card p { color: #cbd5e1; line-height: 1.6; margin-bottom: 1.5rem; }
+        .tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+        .tag { background: rgba(59, 130, 246, 0.2); padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.875rem; }
+        .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
         .stat-card {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
@@ -250,18 +113,8 @@
             border-radius: 1rem;
             padding: 2rem;
         }
-
-        .stat-label {
-            color: #94a3b8;
-            font-size: 0.875rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-value {
-            font-size: 2rem;
-            font-weight: bold;
-        }
-
+        .stat-label { color: #94a3b8; font-size: 0.875rem; margin-bottom: 0.5rem; }
+        .stat-value { font-size: 2rem; font-weight: bold; }
         .chart-container {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
@@ -270,7 +123,6 @@
             padding: 2rem;
             margin-bottom: 2rem;
         }
-
         .address-card {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
@@ -278,24 +130,9 @@
             border-radius: 1rem;
             padding: 2rem;
         }
-
-        .address-text {
-            font-family: monospace;
-            font-size: 0.875rem;
-            word-break: break-all;
-            margin: 0.5rem 0;
-        }
-
-        .timestamp {
-            color: #64748b;
-            font-size: 0.75rem;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 4rem 0;
-        }
-
+        .address-text { font-family: monospace; font-size: 0.875rem; word-break: break-all; margin: 0.5rem 0; }
+        .timestamp { color: #64748b; font-size: 0.75rem; }
+        .loading { text-align: center; padding: 4rem 0; }
         .spinner {
             width: 3rem;
             height: 3rem;
@@ -305,32 +142,11 @@
             animation: spin 1s linear infinite;
             margin: 0 auto 1rem;
         }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        footer {
-            text-align: center;
-            padding: 3rem 2rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: #94a3b8;
-        }
-
-        footer a {
-            color: #94a3b8;
-            text-decoration: none;
-            margin: 0 1rem;
-        }
-
-        footer a:hover {
-            color: white;
-        }
-
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .hidden { display: none; }
+        footer { text-align: center; padding: 3rem 2rem; border-top: 1px solid rgba(255, 255, 255, 0.1); color: #94a3b8; }
+        footer a { color: #94a3b8; text-decoration: none; margin: 0 1rem; }
+        footer a:hover { color: white; }
         @media (max-width: 768px) {
             h1 { font-size: 2.5rem; }
             h2 { font-size: 1.5rem; }
@@ -401,9 +217,7 @@
                 <span class="tag">Web3</span>
                 <span class="tag">Trading</span>
             </div>
-            <a href="https://t.me/buysellsessionsbot" target="_blank" class="btn btn-primary">
-                Try Bot →
-            </a>
+            <a href="https://t.me/buysellsessionsbot" target="_blank" class="btn btn-primary">Try Bot</a>
         </div>
     </section>
 
@@ -447,7 +261,7 @@
     <footer>
         <p>© 2024 Akash. Full Stack Developer.</p>
         <div style="margin-top: 1rem;">
-            <a href="https://t.me/buysellsessionsbot" target="_blank">Telegram</a>
+            <a href="https://t.me/buysellsessionsbot" target="_blank">Telegram Bot</a>
             <a href="https://etherscan.io/address/0x10dE74EBDFa84f5e6390a1A61DEad8d491754039" target="_blank">Etherscan</a>
         </div>
     </footer>
@@ -472,245 +286,46 @@
                 fetch(balanceUrl).then(function(r) { return r.json(); }),
                 fetch(priceUrl).then(function(r) { return r.json(); }),
                 fetch(historyUrl).then(function(r) { return r.json(); })
-            ])
-            .then(function(results) {
+            ]).then(function(results) {
                 var balanceData = results[0];
                 var priceData = results[1];
                 var historyData = results[2];
                 
-                console.log('Balance data:', balanceData);
-                console.log('Price data:', priceData);
-                
                 if (!balanceData.result || balanceData.status === '0') {
-                    throw new Error('API Error: ' + (balanceData.message || 'Invalid balance data'));
+                    throw new Error('API Error: ' + (balanceData.message || 'Invalid balance'));
                 }
                 
-                var ethBalance = parseFloat(balanceData.result) / 1000000000000000000;
+                var ethBalance = parseFloat(balanceData.result) / 1e18;
                 var ethPrice = priceData.ethereum.usd;
                 var totalValue = ethBalance * ethPrice;
                 
-                if (isNaN(ethBalance) || isNaN(ethPrice)) {
-                    throw new Error('Calculation error: balance=' + ethBalance + ', price=' + ethPrice);
-                }
-                
                 document.getElementById('ethBalance').textContent = ethBalance.toFixed(4) + ' ETH';
-                document.getElementById('ethPrice').textContent = '
-
-        function createChart(priceHistory, ethBalance) {
-            var ctx = document.getElementById('portfolioChart');
-            var labels = [];
-            var portfolioValues = [];
-            
-            for (var i = 0; i < priceHistory.length; i++) {
-                var date = new Date(priceHistory[i][0]);
-                var month = date.toLocaleDateString('en-US', { month: 'short' });
-                var day = date.getDate();
-                labels.push(month + ' ' + day);
-                portfolioValues.push(priceHistory[i][1] * ethBalance);
-            }
-            
-            if (portfolioChart) {
-                portfolioChart.destroy();
-            }
-            
-            portfolioChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Portfolio Value',
-                        data: portfolioValues,
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        tension: 0.4,
-                        fill: true,
-                        pointRadius: 3,
-                        pointHoverRadius: 6,
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                            padding: 12,
-                            callbacks: {
-                                label: function(context) {
-                                    return '$' + Math.round(context.parsed.y).toLocaleString();
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            ticks: {
-                                color: '#94a3b8',
-                                callback: function(value) {
-                                    return '$' + Math.round(value).toLocaleString();
-                                }
-                            },
-                            grid: {
-                                color: 'rgba(148, 163, 184, 0.1)'
-                            }
-                        },
-                        x: {
-                            ticks: {
-                                color: '#94a3b8'
-                            },
-                            grid: {
-                                color: 'rgba(148, 163, 184, 0.1)'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        var links = document.querySelectorAll('a[href^="#"]');
-        for (var i = 0; i < links.length; i++) {
-            links[i].addEventListener('click', function(e) {
-                e.preventDefault();
-                var targetId = this.getAttribute('href');
-                var target = document.querySelector(targetId);
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
-        }
-
-        fetchPortfolioData();
-        setInterval(fetchPortfolioData, 120000);
-    </script>
-</body>
-</html> + Math.round(ethPrice).toLocaleString();
-                document.getElementById('totalValue').textContent = '
-
-        function createChart(priceHistory, ethBalance) {
-            var ctx = document.getElementById('portfolioChart');
-            var labels = [];
-            var portfolioValues = [];
-            
-            for (var i = 0; i < priceHistory.length; i++) {
-                var date = new Date(priceHistory[i][0]);
-                var month = date.toLocaleDateString('en-US', { month: 'short' });
-                var day = date.getDate();
-                labels.push(month + ' ' + day);
-                portfolioValues.push(priceHistory[i][1] * ethBalance);
-            }
-            
-            if (portfolioChart) {
-                portfolioChart.destroy();
-            }
-            
-            portfolioChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Portfolio Value',
-                        data: portfolioValues,
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        tension: 0.4,
-                        fill: true,
-                        pointRadius: 3,
-                        pointHoverRadius: 6,
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                            padding: 12,
-                            callbacks: {
-                                label: function(context) {
-                                    return '$' + Math.round(context.parsed.y).toLocaleString();
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            ticks: {
-                                color: '#94a3b8',
-                                callback: function(value) {
-                                    return '$' + Math.round(value).toLocaleString();
-                                }
-                            },
-                            grid: {
-                                color: 'rgba(148, 163, 184, 0.1)'
-                            }
-                        },
-                        x: {
-                            ticks: {
-                                color: '#94a3b8'
-                            },
-                            grid: {
-                                color: 'rgba(148, 163, 184, 0.1)'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        var links = document.querySelectorAll('a[href^="#"]');
-        for (var i = 0; i < links.length; i++) {
-            links[i].addEventListener('click', function(e) {
-                e.preventDefault();
-                var targetId = this.getAttribute('href');
-                var target = document.querySelector(targetId);
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
-        }
-
-        fetchPortfolioData();
-        setInterval(fetchPortfolioData, 120000);
-    </script>
-</body>
-</html> + Math.round(totalValue).toLocaleString();
+                document.getElementById('ethPrice').textContent = '$' + Math.round(ethPrice).toLocaleString();
+                document.getElementById('totalValue').textContent = '$' + Math.round(totalValue).toLocaleString();
                 document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
                 
                 createChart(historyData.prices, ethBalance);
                 
                 document.getElementById('loading').classList.add('hidden');
                 document.getElementById('portfolioContent').classList.remove('hidden');
-            })
-            .catch(function(error) {
-                console.error('Error:', error);
-                document.getElementById('loading').innerHTML = '<p style="color: #f87171;">Failed to load portfolio data.<br>Error: ' + error.message + '<br>Check browser console for details.</p>';
+            }).catch(function(error) {
+                console.error('Portfolio Error:', error);
+                document.getElementById('loading').innerHTML = '<p style="color: #f87171;">Failed to load: ' + error.message + '</p>';
             });
         }
 
         function createChart(priceHistory, ethBalance) {
             var ctx = document.getElementById('portfolioChart');
             var labels = [];
-            var portfolioValues = [];
+            var values = [];
             
             for (var i = 0; i < priceHistory.length; i++) {
-                var date = new Date(priceHistory[i][0]);
-                var month = date.toLocaleDateString('en-US', { month: 'short' });
-                var day = date.getDate();
-                labels.push(month + ' ' + day);
-                portfolioValues.push(priceHistory[i][1] * ethBalance);
+                var d = new Date(priceHistory[i][0]);
+                labels.push(d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+                values.push(priceHistory[i][1] * ethBalance);
             }
             
-            if (portfolioChart) {
-                portfolioChart.destroy();
-            }
+            if (portfolioChart) portfolioChart.destroy();
             
             portfolioChart = new Chart(ctx, {
                 type: 'line',
@@ -718,29 +333,25 @@
                     labels: labels,
                     datasets: [{
                         label: 'Portfolio Value',
-                        data: portfolioValues,
+                        data: values,
                         borderColor: '#3b82f6',
                         backgroundColor: 'rgba(59, 130, 246, 0.1)',
                         tension: 0.4,
                         fill: true,
                         pointRadius: 3,
-                        pointHoverRadius: 6,
                         borderWidth: 2
                     }]
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: true,
                     plugins: {
-                        legend: {
-                            display: false
-                        },
+                        legend: { display: false },
                         tooltip: {
                             backgroundColor: 'rgba(0, 0, 0, 0.8)',
                             padding: 12,
                             callbacks: {
-                                label: function(context) {
-                                    return '$' + Math.round(context.parsed.y).toLocaleString();
+                                label: function(ctx) {
+                                    return '$' + Math.round(ctx.parsed.y).toLocaleString();
                                 }
                             }
                         }
@@ -749,21 +360,15 @@
                         y: {
                             ticks: {
                                 color: '#94a3b8',
-                                callback: function(value) {
-                                    return '$' + Math.round(value).toLocaleString();
+                                callback: function(val) {
+                                    return '$' + Math.round(val).toLocaleString();
                                 }
                             },
-                            grid: {
-                                color: 'rgba(148, 163, 184, 0.1)'
-                            }
+                            grid: { color: 'rgba(148, 163, 184, 0.1)' }
                         },
                         x: {
-                            ticks: {
-                                color: '#94a3b8'
-                            },
-                            grid: {
-                                color: 'rgba(148, 163, 184, 0.1)'
-                            }
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: 'rgba(148, 163, 184, 0.1)' }
                         }
                     }
                 }
@@ -774,11 +379,8 @@
         for (var i = 0; i < links.length; i++) {
             links[i].addEventListener('click', function(e) {
                 e.preventDefault();
-                var targetId = this.getAttribute('href');
-                var target = document.querySelector(targetId);
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
+                var target = document.querySelector(this.getAttribute('href'));
+                if (target) target.scrollIntoView({ behavior: 'smooth' });
             });
         }
 
