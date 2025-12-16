@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Akash - Developer Portfolio</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -427,214 +427,34 @@
     <script>
         var ETH_ADDRESS = '0x10dE74EBDFa84f5e6390a1A61DEad8d491754039';
         var ETHERSCAN_API_KEY = 'KGCJ6B1CEYAEQTC3BPR42HVGNXNHFA1537';
-        var chart = null;
+        var portfolioChart = null;
 
         function fetchPortfolioData() {
+            var balanceUrl = 'https://api.etherscan.io/api?module=account&action=balance&address=' + ETH_ADDRESS + '&tag=latest&apikey=' + ETHERSCAN_API_KEY;
+            var priceUrl = 'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd';
+            var historyUrl = 'https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=7';
+            
             Promise.all([
-                fetch('https://api.etherscan.io/api?module=account&action=balance&address=' + ETH_ADDRESS + '&tag=latest&apikey=' + ETHERSCAN_API_KEY).then(function(r) { return r.json(); }),
-                fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd').then(function(r) { return r.json(); }),
-                fetch('https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=usd&days=7').then(function(r) { return r.json(); })
+                fetch(balanceUrl).then(function(r) { return r.json(); }),
+                fetch(priceUrl).then(function(r) { return r.json(); }),
+                fetch(historyUrl).then(function(r) { return r.json(); })
             ])
             .then(function(results) {
                 var balanceData = results[0];
                 var priceData = results[1];
                 var historyData = results[2];
                 
-                if (!balanceData.result || balanceData.result === '0') {
+                if (!balanceData.result) {
                     throw new Error('Invalid balance data');
                 }
                 
-                var ethBalance = parseFloat(balanceData.result) / 1e18;
+                var ethBalance = parseFloat(balanceData.result) / 1000000000000000000;
                 var ethPrice = priceData.ethereum.usd;
                 var totalValue = ethBalance * ethPrice;
                 
-                if (isNaN(ethBalance) || isNaN(ethPrice)) {
-                    throw new Error('Invalid data received');
-                }
-                
                 document.getElementById('ethBalance').textContent = ethBalance.toFixed(4) + ' ETH';
-                document.getElementById('ethPrice').textContent = '
-
-        function createChart(priceHistory, ethBalance) {
-            var ctx = document.getElementById('portfolioChart');
-            
-            var labels = [];
-            var portfolioValues = [];
-            
-            for (var i = 0; i < priceHistory.length; i++) {
-                var date = new Date(priceHistory[i][0]);
-                labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
-                portfolioValues.push(priceHistory[i][1] * ethBalance);
-            }
-            
-            if (chart) {
-                chart.destroy();
-            }
-            
-            chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Portfolio Value',
-                        data: portfolioValues,
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        tension: 0.4,
-                        fill: true,
-                        pointRadius: 3,
-                        pointHoverRadius: 6,
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                            padding: 12,
-                            callbacks: {
-                                label: function(context) {
-                                    return '$' + Math.round(context.parsed.y).toLocaleString();
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            ticks: {
-                                color: '#94a3b8',
-                                callback: function(value) {
-                                    return '$' + Math.round(value).toLocaleString();
-                                }
-                            },
-                            grid: {
-                                color: 'rgba(148, 163, 184, 0.1)'
-                            }
-                        },
-                        x: {
-                            ticks: {
-                                color: '#94a3b8'
-                            },
-                            grid: {
-                                color: 'rgba(148, 163, 184, 0.1)'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                var target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
-        });
-
-        fetchPortfolioData();
-        setInterval(fetchPortfolioData, 120000);
-    </script>
-</body>
-</html> + Math.round(ethPrice).toLocaleString();
-                document.getElementById('totalValue').textContent = '
-
-        function createChart(priceHistory, ethBalance) {
-            var ctx = document.getElementById('portfolioChart');
-            
-            var labels = [];
-            var portfolioValues = [];
-            
-            for (var i = 0; i < priceHistory.length; i++) {
-                var date = new Date(priceHistory[i][0]);
-                labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
-                portfolioValues.push(priceHistory[i][1] * ethBalance);
-            }
-            
-            if (chart) {
-                chart.destroy();
-            }
-            
-            chart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Portfolio Value',
-                        data: portfolioValues,
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                        tension: 0.4,
-                        fill: true,
-                        pointRadius: 3,
-                        pointHoverRadius: 6,
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                            padding: 12,
-                            callbacks: {
-                                label: function(context) {
-                                    return '$' + Math.round(context.parsed.y).toLocaleString();
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            ticks: {
-                                color: '#94a3b8',
-                                callback: function(value) {
-                                    return '$' + Math.round(value).toLocaleString();
-                                }
-                            },
-                            grid: {
-                                color: 'rgba(148, 163, 184, 0.1)'
-                            }
-                        },
-                        x: {
-                            ticks: {
-                                color: '#94a3b8'
-                            },
-                            grid: {
-                                color: 'rgba(148, 163, 184, 0.1)'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                var target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
-        });
-
-        fetchPortfolioData();
-        setInterval(fetchPortfolioData, 120000);
-    </script>
-</body>
-</html> + Math.round(totalValue).toLocaleString();
+                document.getElementById('ethPrice').textContent = '$' + Math.round(ethPrice).toLocaleString();
+                document.getElementById('totalValue').textContent = '$' + Math.round(totalValue).toLocaleString();
                 document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
                 
                 createChart(historyData.prices, ethBalance);
@@ -644,27 +464,28 @@
             })
             .catch(function(error) {
                 console.error('Error:', error);
-                document.getElementById('loading').innerHTML = '<p style="color: #f87171;">Failed to load portfolio data. Please check the console for details.</p>';
+                document.getElementById('loading').innerHTML = '<p style="color: #f87171;">Failed to load portfolio data. Error: ' + error.message + '</p>';
             });
         }
 
         function createChart(priceHistory, ethBalance) {
             var ctx = document.getElementById('portfolioChart');
-            
             var labels = [];
             var portfolioValues = [];
             
             for (var i = 0; i < priceHistory.length; i++) {
                 var date = new Date(priceHistory[i][0]);
-                labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+                var month = date.toLocaleDateString('en-US', { month: 'short' });
+                var day = date.getDate();
+                labels.push(month + ' ' + day);
                 portfolioValues.push(priceHistory[i][1] * ethBalance);
             }
             
-            if (chart) {
-                chart.destroy();
+            if (portfolioChart) {
+                portfolioChart.destroy();
             }
             
-            chart = new Chart(ctx, {
+            portfolioChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: labels,
@@ -722,15 +543,17 @@
             });
         }
 
-        document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
-            anchor.addEventListener('click', function (e) {
+        var links = document.querySelectorAll('a[href^="#"]');
+        for (var i = 0; i < links.length; i++) {
+            links[i].addEventListener('click', function(e) {
                 e.preventDefault();
-                var target = document.querySelector(this.getAttribute('href'));
+                var targetId = this.getAttribute('href');
+                var target = document.querySelector(targetId);
                 if (target) {
                     target.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
             });
-        });
+        }
 
         fetchPortfolioData();
         setInterval(fetchPortfolioData, 120000);
